@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitosha 100 — Race Predictions</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0c0f0a; --bg2: #141810; --bg3: #1a2016;
+    --surface: #1f271a; --surface2: #273120;
+    --border: rgba(160,200,100,0.12); --border2: rgba(160,200,100,0.22);
+    --green: #8dc63f; --green2: #b8e06a; --green-dim: rgba(141,198,63,0.15);
+    --amber: #e8a830;
+    --text: #e8edd8; --text2: #9aaa80; --text3: #5a6a48;
+    --radius: 10px;
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'Figtree', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+  .hero { position: relative; overflow: hidden; padding: 60px 24px 48px; text-align: center; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #111a0d 0%, var(--bg) 100%); }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(141,198,63,0.08) 0%, transparent 70%); pointer-events: none; }
+  .race-label { display: inline-block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--green); background: var(--green-dim); border: 1px solid rgba(141,198,63,0.3); padding: 4px 14px; border-radius: 100px; margin-bottom: 20px; }
+  .hero h1 { font-family: var(--font-display); font-size: clamp(52px, 8vw, 88px); line-height: 0.95; letter-spacing: -0.02em; color: var(--text); margin-bottom: 10px; }
+  .hero h1 em { color: var(--green); font-style: italic; }
+  .hero-sub { font-size: 15px; color: var(--text2); margin-bottom: 32px; font-weight: 300; letter-spacing: 0.04em; }
+  .race-meta { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+  .meta-item { text-align: center; }
+  .meta-label { font-size: 11px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .meta-value { font-size: 16px; font-weight: 600; color: var(--text); }
+  .meta-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .section-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .icon-men { background: rgba(55,138,221,0.15); }
+  .icon-women { background: rgba(212,83,126,0.15); }
+  .section-title { font-family: var(--font-display); font-size: 28px; }
+  .section-title.men { color: #7ab8f5; }
+  .section-title.women { color: #e896b8; }
+  .section-badge { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--text3); background: var(--surface); border: 1px solid var(--border); padding: 3px 10px; border-radius: 100px; }
+
+  .gender-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 48px; }
+  @media (max-width: 720px) { .gender-sections { grid-template-columns: 1fr; } }
+  .gender-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .panel-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border); }
+  .panel-header.men { background: linear-gradient(135deg, rgba(55,138,221,0.06) 0%, transparent 60%); }
+  .panel-header.women { background: linear-gradient(135deg, rgba(212,83,126,0.06) 0%, transparent 60%); }
+  .panel-body { padding: 20px 22px; }
+
+  .winner-time-block { margin-bottom: 20px; }
+  .field-label { font-size: 12px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .time-inputs { display: flex; align-items: center; gap: 6px; }
+  .time-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono); font-size: 18px; text-align: center; padding: 8px 6px; border-radius: 8px; width: 52px; outline: none; -moz-appearance: textfield; transition: border-color 0.15s; }
+  .time-input::-webkit-outer-spin-button, .time-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .time-input:focus { border-color: var(--green); }
+  .time-input.required-error { border-color: #e05a5a; animation: shake 0.3s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+  .position-row.required-pick { border-color: rgba(160,200,100,0.35); }
+  .position-row.required-pick .pos-badge { box-shadow: 0 0 0 1px rgba(232,168,48,0.4); }
+  .position-row.required-error { border-color: #e05a5a; animation: shake 0.3s ease; }
+  .required-hint { font-size: 10px; font-family: var(--font-mono); color: var(--text3); margin-top: 4px; letter-spacing: 0.06em; }
+  .required-hint span { color: #e8a830; }
+  .time-sep { color: var(--text3); font-family: var(--font-mono); font-size: 18px; }
+  .time-unit { font-size: 11px; font-family: var(--font-mono); color: var(--text3); margin-top: 4px; text-align: center; }
+
+  .positions-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .positions-label { font-size: 12px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; }
+  .show-more-btn { background: none; border: none; color: var(--green); font-size: 12px; font-family: var(--font-mono); cursor: pointer; padding: 0; }
+  .show-more-btn:hover { color: var(--green2); }
+  .positions-grid { display: flex; flex-direction: column; gap: 8px; }
+  .positions-collapsed .position-row:nth-child(n+4) { display: none; }
+  .position-row { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; transition: border-color 0.15s; }
+  .position-row:hover { border-color: var(--border2); }
+  .pos-badge { font-family: var(--font-mono); font-size: 12px; font-weight: 500; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pos-1 { background: rgba(232,168,48,0.18); color: #e8a830; }
+  .pos-2 { background: rgba(180,180,200,0.15); color: #b0b8cc; }
+  .pos-3 { background: rgba(180,110,60,0.15); color: #c87a48; }
+  .pos-other { background: var(--surface2); color: var(--text3); }
+
+  .select-wrapper { flex: 1; overflow: hidden; }
+  .athlete-select-trigger { width: 100%; background: transparent; border: none; color: var(--text); font-family: var(--font-body); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 6px; outline: none; padding: 0; }
+  .trigger-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; color: var(--text2); }
+  .trigger-name.selected { color: var(--text); }
+  .trigger-arrow { font-size: 10px; color: var(--text3); flex-shrink: 0; transition: transform 0.2s; }
+  .trigger-arrow.open { transform: rotate(180deg); }
+
+  .dropdown-panel { position: fixed; z-index: 9999; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); overflow: hidden; display: none; box-shadow: 0 16px 40px rgba(0,0,0,0.55); }
+  .dropdown-panel.open { display: block; }
+  .dropdown-search { padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .dropdown-search input { flex: 1; background: transparent; border: none; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; }
+  .dropdown-search input::placeholder { color: var(--text3); }
+  .search-icon { color: var(--text3); font-size: 15px; }
+  .dropdown-list { max-height: 240px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+  .dropdown-option { display: flex; align-items: center; gap: 8px; padding: 9px 14px; cursor: pointer; font-size: 13px; transition: background 0.1s; }
+  .dropdown-option:hover { background: var(--surface2); }
+  .dropdown-option.selected { background: var(--green-dim); }
+  .dropdown-option.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+  .opt-star { font-size: 12px; color: var(--amber); flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; }
+  .opt-star-count { font-family: var(--font-mono); font-size: 10px; color: var(--amber); opacity: 0.85; }
+  .opt-star-empty { font-size: 12px; color: var(--text3); opacity: 0.3; flex-shrink: 0; }
+  .opt-number { font-family: var(--font-mono); font-size: 11px; color: var(--text3); min-width: 28px; }
+  .opt-country { margin-left: auto; font-size: 13px; }
+  .dropdown-section-label { font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); padding: 8px 14px 4px; border-top: 1px solid var(--border); }
+  .dropdown-section-label:first-child { border-top: none; }
+  .no-results { padding: 14px; text-align: center; color: var(--text3); font-size: 13px; }
+
+  .submit-area { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .submit-info h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 4px; }
+  .submit-info p { font-size: 14px; color: var(--text2); }
+  .submit-right { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+  .name-input-wrap { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .name-input-label { font-size: 11px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; text-align: center; }
+  .name-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; border-radius: 100px; outline: none; width: 180px; transition: border-color 0.15s; }
+  .name-input::placeholder { color: var(--text3); }
+  .name-input:focus { border-color: var(--green); }
+  .name-input.required-error { border-color: #e05a5a; animation: shake 0.3s ease; }
+  .btn-submit { background: var(--green); color: #0c1a06; font-family: var(--font-body); font-weight: 600; font-size: 15px; border: none; padding: 13px 32px; border-radius: 100px; cursor: pointer; transition: background 0.15s, transform 0.1s; white-space: nowrap; }
+  .btn-submit:hover { background: var(--green2); transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); }
+
+  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1px solid var(--green); color: var(--green2); font-size: 14px; font-family: var(--font-mono); padding: 12px 24px; border-radius: 100px; z-index: 10000; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s; opacity: 0; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.error { border-color: #e05a5a; color: #f08080; }
+
+  .predictions-section { margin-top: 48px; }
+  .predictions-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+  .predictions-title { font-family: var(--font-display); font-size: 26px; }
+  .predictions-count { font-family: var(--font-mono); font-size: 13px; color: var(--text3); }
+
+  .pred-cards { display: flex; flex-direction: column; gap: 10px; }
+
+  .pred-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .pred-card-header { display: flex; align-items: center; gap: 14px; padding: 14px 18px; cursor: pointer; transition: background 0.12s; user-select: none; }
+  .pred-card-header:hover { background: var(--surface2); }
+  .pred-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 15px; flex-shrink: 0; }
+  .pred-author-info { flex: 1; min-width: 0; }
+  .pred-author-name { font-weight: 600; font-size: 14px; }
+  .pred-author-meta { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
+  .pred-quick { display: flex; gap: 20px; flex-wrap: wrap; flex-shrink: 0; }
+  .pred-quick-item { text-align: right; }
+  .pred-quick-label { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; display: block; }
+  .pred-quick-val { font-size: 13px; color: var(--text2); white-space: nowrap; }
+  .pred-chevron { color: var(--text3); font-size: 11px; transition: transform 0.2s; flex-shrink: 0; }
+  .pred-card.open .pred-chevron { transform: rotate(90deg); }
+
+  .pred-card-body { display: none; border-top: 1px solid var(--border); padding: 18px 20px 20px; }
+  .pred-card.open .pred-card-body { display: block; }
+
+  .pred-detail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 540px) { .pred-detail-cols { grid-template-columns: 1fr; } }
+  .pred-detail-col h4 { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .pred-detail-col h4.men-h { color: #7ab8f5; }
+  .pred-detail-col h4.women-h { color: #e896b8; }
+  .pick-list { display: flex; flex-direction: column; gap: 5px; }
+  .pick-row { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+  .pick-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); min-width: 22px; }
+  .pick-medal { font-size: 13px; min-width: 18px; }
+  .pick-name { color: var(--text2); }
+  .pick-name.top { color: var(--text); font-weight: 500; }
+  .pick-time { margin-top: 10px; font-family: var(--font-mono); font-size: 15px; color: var(--green); }
+  .pick-no-time { margin-top: 8px; font-size: 12px; color: var(--text3); font-style: italic; }
+  .pick-time-lbl { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 10px; }
+
+  .btn-full-detail { background: none; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; padding: 5px 14px; border-radius: 100px; cursor: pointer; transition: color 0.12s, border-color 0.12s; margin-top: 14px; float: right; }
+  .btn-full-detail:hover { color: var(--text); border-color: var(--green); }
+
+  .divider { height: 1px; background: var(--border); margin: 40px 0; }
+  .empty-state { text-align: center; padding: 48px; color: var(--text3); font-size: 15px; }
+  .empty-icon { font-size: 36px; margin-bottom: 12px; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 9998; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; width: 100%; max-width: 660px; max-height: 88vh; overflow-y: auto; }
+  .modal-header { display: flex; align-items: center; gap: 14px; padding: 20px 24px 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg2); z-index: 1; }
+  .modal-avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 17px; flex-shrink: 0; }
+  .modal-author-name { font-weight: 600; font-size: 17px; }
+  .modal-author-sub { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
+  .modal-close { margin-left: auto; background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; line-height: 1; transition: color 0.12s; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 22px 24px 28px; }
+  .modal-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 520px) { .modal-cols { grid-template-columns: 1fr; } }
+  .modal-col h4 { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .modal-col h4.men-h { color: #7ab8f5; }
+  .modal-col h4.women-h { color: #e896b8; }
+  .modal-pick-rows { display: flex; flex-direction: column; gap: 5px; }
+  .modal-pick-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; background: var(--surface); border-radius: 8px; font-size: 13px; }
+  .modal-pick-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); min-width: 28px; }
+  .modal-pick-medal { font-size: 15px; min-width: 20px; }
+  .modal-pick-name { flex: 1; color: var(--text2); }
+  .modal-pick-name.top { color: var(--text); font-weight: 500; }
+  .modal-pick-country { font-size: 14px; }
+  .modal-time-box { display: inline-flex; align-items: baseline; gap: 8px; background: var(--green-dim); border: 1px solid rgba(141,198,63,0.2); border-radius: 8px; padding: 8px 16px; margin-top: 12px; }
+  .modal-time-val { font-family: var(--font-mono); font-size: 20px; color: var(--green2); }
+  .modal-time-label { font-size: 12px; color: var(--text3); }
+  .modal-no-time { margin-top: 10px; color: var(--text3); font-size: 13px; font-style: italic; }
+  .modal-divider { height: 1px; background: var(--border); margin: 20px 0; display: none; }
+  @media (max-width: 520px) { .modal-divider { display: block; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="race-label">Race Predictions</div>
+  <h1>Vitosha <em>100</em></h1>
+  <p class="hero-sub">Trail Ultramarathon · Sofia, Bulgaria · June 27-28, 2026</p>
+  <div class="race-meta">
+    <div class="meta-item"><span class="meta-label">Distance</span><span class="meta-value">99.2 km</span></div>
+    <div class="meta-divider"></div>
+    <div class="meta-item"><span class="meta-label">Elevation</span><span class="meta-value">1875 m</span></div>
+    <div class="meta-divider"></div>
+    <div class="meta-item"><span class="meta-label">Registered</span><span class="meta-value">789 athletes</span></div>
+    <div class="meta-divider"></div>
+    <div class="meta-item"><span class="meta-label">Edition</span><span class="meta-value">43rd</span></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="gender-sections">
+    <!-- MEN -->
+    <div class="gender-panel" id="panel-men">
+      <div class="panel-header men">
+        <div class="section-header">
+          <div class="section-icon icon-men">♂</div>
+          <span class="section-title men">Men</span>
+          <span class="section-badge" id="men-picked-count">0 / 10 picked</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="winner-time-block">
+          <label class="field-label">Predicted winner time <span style="color:var(--amber)">✦ Required</span></label>
+          <div class="time-inputs">
+            <div><input class="time-input" type="number" id="men-h" min="0" max="99" placeholder="HH"><div class="time-unit">h</div></div>
+            <span class="time-sep">:</span>
+            <div><input class="time-input" type="number" id="men-m" min="0" max="59" placeholder="MM"><div class="time-unit">min</div></div>
+            <span class="time-sep">:</span>
+            <div><input class="time-input" type="number" id="men-s" min="0" max="59" placeholder="SS"><div class="time-unit">sec</div></div>
+          </div>
+        </div>
+        <div class="positions-header">
+          <span class="positions-label">Top 10 finishers <span style="color:var(--amber);font-size:10px;">✦ Top 3 required</span></span>
+          <button class="show-more-btn" onclick="togglePositions('men')">show up to 10</button>
+        </div>
+        <div class="positions-grid positions-collapsed" id="positions-men"></div>
+      </div>
+    </div>
+    <!-- WOMEN -->
+    <div class="gender-panel" id="panel-women">
+      <div class="panel-header women">
+        <div class="section-header">
+          <div class="section-icon icon-women">♀</div>
+          <span class="section-title women">Women</span>
+          <span class="section-badge" id="women-picked-count">0 / 10 picked</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="winner-time-block">
+          <label class="field-label">Predicted winner time <span style="color:var(--amber)">✦ Required</span></label>
+          <div class="time-inputs">
+            <div><input class="time-input" type="number" id="women-h" min="0" max="99" placeholder="HH"><div class="time-unit">h</div></div>
+            <span class="time-sep">:</span>
+            <div><input class="time-input" type="number" id="women-m" min="0" max="59" placeholder="MM"><div class="time-unit">min</div></div>
+            <span class="time-sep">:</span>
+            <div><input class="time-input" type="number" id="women-s" min="0" max="59" placeholder="SS"><div class="time-unit">sec</div></div>
+          </div>
+        </div>
+        <div class="positions-header">
+          <span class="positions-label">Top 10 finishers <span style="color:var(--amber);font-size:10px;">✦ Top 3 required</span></span>
+          <button class="show-more-btn" onclick="togglePositions('women')">show up to 10</button>
+        </div>
+        <div class="positions-grid positions-collapsed" id="positions-women"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <div class="submit-info">
+      <h3>Submit your prediction</h3>
+      <p>Predictions lock 1 hour before race start · June 14, 2025 at 05:00</p>
+    </div>
+    <div class="submit-right">
+      <div class="name-input-wrap">
+        <span class="name-input-label">Your name <span style="color:var(--amber)">✦ Required</span></span>
+        <input class="name-input" type="text" id="submitter-name" placeholder="e.g. Ivan Petrov" maxlength="40" autocomplete="name">
+      </div>
+      <button class="btn-submit" onclick="submitPrediction()">Submit Prediction →</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="predictions-section">
+    <div class="predictions-header">
+      <span class="predictions-title">Community Predictions</span>
+      <span class="predictions-count" id="total-predictions-count">0 predictions</span>
+    </div>
+    <div id="predictions-container"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="dropdown-panel" id="dropdown-portal"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header" id="modal-header"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const MEN_ATHLETES = [
+  { id: 'm1',  bib: 1,  name: 'Христо Цветков',      country: '🇧🇬' },
+  { id: 'm2',  bib: 2,  name: 'Димитър Шадура',       country: '🇧🇬' },
+  { id: 'm3',  bib: 3,  name: 'Пламен Пенов',         country: '🇧🇬' },
+  { id: 'm4',  bib: 4,  name: 'Александър Спасов',    country: '🇧🇬' },
+  { id: 'm5',  bib: 5,  name: 'Ивайло Атанасов',      country: '🇧🇬' },
+  { id: 'm6',  bib: 6,  name: 'Николай Стойчев',      country: '🇧🇬' },
+  { id: 'm7',  bib: 7,  name: 'Александър Христов',   country: '🇧🇬' },
+  { id: 'm8',  bib: 8,  name: 'Даниел Кубашлиев',     country: '🇧🇬' },
+  { id: 'm9',  bib: 9,  name: 'Антон Кадиев',         country: '🇧🇬' },
+  { id: 'm10', bib: 10, name: 'Атанас Парашкевов',    country: '🇧🇬' },
+  { id: 'm11', bib: 11, name: 'Стилян Аврамов',       country: '🇧🇬' },
+  { id: 'm12', bib: 12, name: 'Христо Минков',        country: '🇧🇬' },
+  { id: 'm13', bib: 13, name: 'Владимир Ставрев',     country: '🇧🇬' },
+  { id: 'm14', bib: 14, name: 'Андриан Кърпаров',     country: '🇧🇬' },
+  { id: 'm15', bib: 15, name: 'Андрей Гридин',        country: '🇧🇬' },
+  { id: 'm16', bib: 16, name: 'Тодор Цанков',         country: '🇧🇬' },
+  { id: 'm17', bib: 17, name: 'Никола Кондарев',      country: '🇧🇬' },
+  { id: 'm18', bib: 18, name: 'Любомир Тодоров',      country: '🇧🇬' },
+  { id: 'm19', bib: 19, name: 'Георги Добрев',        country: '🇧🇬' },
+  { id: 'm20', bib: 20, name: 'Росен Русев',          country: '🇧🇬' },
+  { id: 'm21', bib: 21, name: 'Калоян Чанев',         country: '🇧🇬' },
+  { id: 'm22', bib: 22, name: 'Стефан Иванов',        country: '🇧🇬' },
+  { id: 'm23', bib: 23, name: 'Иво Андреев',          country: '🇧🇬' },
+  { id: 'm24', bib: 24, name: 'Julien Feutrie',       country: '🇫🇷' },
+  { id: 'm25', bib: 25, name: 'Тодор Георгиев',       country: '🇧🇬' },
+  { id: 'm26', bib: 26, name: 'Петко Стефанов',       country: '🇧🇬' },
+  { id: 'm27', bib: 27, name: 'Фатих Хюсеин',         country: '🇧🇬' },
+  { id: 'm28', bib: 28, name: 'Самуил Вълчев',        country: '🇧🇬' },
+  { id: 'm29', bib: 29, name: 'Ивайло Хаджиев',       country: '🇧🇬' },
+  { id: 'm30', bib: 30, name: 'Станимир Димитров',    country: '🇧🇬' },
+  { id: 'm31', bib: 31, name: 'Емил Недков',          country: '🇧🇬' },
+  { id: 'm32', bib: 32, name: 'Румен Костадинов',     country: '🇧🇬' },
+  { id: 'm33', bib: 33, name: 'Димитър Цанков',       country: '🇧🇬' },
+  { id: 'm34', bib: 34, name: 'Кольо Райчинов',       country: '🇧🇬' },
+  { id: 'm35', bib: 35, name: 'Кристиян Кирилов',     country: '🇧🇬' },
+  { id: 'm36', bib: 36, name: 'Никола Стойчев',       country: '🇧🇬' },
+  { id: 'm37', bib: 37, name: 'Васил Гуджев',         country: '🇧🇬' },
+  { id: 'm38', bib: 38, name: 'Виктор Методиев',      country: '🇧🇬' },
+  { id: 'm39', bib: 39, name: 'Константин Атанасов',  country: '🇧🇬' },
+  { id: 'm40', bib: 40, name: 'Иван Гочев',           country: '🇧🇬' },
+];
+
+const WOMEN_ATHLETES = [
+  { id: 'w1', bib: 1, name: 'Мария Николова',    country: '🇧🇬' },
+  { id: 'w2', bib: 2, name: 'Моника Филипова',   country: '🇧🇬' },
+  { id: 'w3', bib: 3, name: 'Надежда Ангелова',  country: '🇧🇬' },
+  { id: 'w4', bib: 4, name: 'Полина Горасова',   country: '🇧🇬' },
+  { id: 'w5', bib: 5, name: 'Антония Георгиева', country: '🇧🇬' },
+  { id: 'w6', bib: 6, name: 'Нели Петкова',      country: '🇧🇬' },
+  { id: 'w7', bib: 7, name: 'Елеонора Григорова',country: '🇧🇬' },
+];
+
+function findA(arr, id) { return arr.find(a => a.id === id) || null; }
+
+// ── AVATAR HELPERS ────────────────────────────────────────────────────────────
+const AVATAR_PALETTES = [
+  { bg: '#1c3010', fg: '#8dc63f' }, { bg: '#2a1530', fg: '#e896b8' },
+  { bg: '#102030', fg: '#7ab8f5' }, { bg: '#2a1f10', fg: '#e8a830' },
+  { bg: '#1a1030', fg: '#b898f8' }, { bg: '#101a28', fg: '#60c8e8' },
+  { bg: '#281018', fg: '#e87080' }, { bg: '#101c10', fg: '#60c860' },
+];
+function nameToInitials(name) {
+  const parts = name.trim().split(/\s+/);
+  return parts.length >= 2 ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase() : name.slice(0,2).toUpperCase();
+}
+function nameToPalette(name) { return AVATAR_PALETTES[name.split('').reduce((a,c) => a + c.charCodeAt(0), 0) % AVATAR_PALETTES.length]; }
+
+// ── LOCALSTORAGE ──────────────────────────────────────────────────────────────
+const LS_KEY = 'vitosha100_predictions';
+
+function saveToStorage(preds) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(preds)); } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch(e) { return []; }
+}
+
+const predictions = loadFromStorage();
+
+// ── MENTION COUNTS: how many times each athlete appears in predictions ────────
+function getMentionCounts(gender) {
+  const counts = new Map();
+  predictions.forEach(p => {
+    const picks = gender === 'men' ? p.men.picks : p.women.picks;
+    picks.forEach(a => { if (a) counts.set(a.id, (counts.get(a.id) || 0) + 1); });
+  });
+  return counts;
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const state = { men: { picks: Array(10).fill(null) }, women: { picks: Array(10).fill(null) } };
+let activeDropdown = null;
+
+function posLabel(i) { return ['1st','2nd','3rd'][i] || `${i+1}th`; }
+function posClass(i) { return ['pos-1','pos-2','pos-3'][i] || 'pos-other'; }
+function medal(i) { return ['🥇','🥈','🥉'][i] || ''; }
+
+// ── BUILD POSITIONS ───────────────────────────────────────────────────────────
+function buildPositionsGrid(gender) {
+  const athletes = gender === 'men' ? MEN_ATHLETES : WOMEN_ATHLETES;
+  const grid = document.getElementById(`positions-${gender}`);
+  grid.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const row = document.createElement('div');
+    row.className = 'position-row' + (i < 3 ? ' required-pick' : '');
+    row.id = `row-${gender}-${i}`;
+
+    const badge = document.createElement('div');
+    badge.className = `pos-badge ${posClass(i)}`;
+    badge.textContent = posLabel(i);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'select-wrapper';
+
+    const trigger = document.createElement('button');
+    trigger.className = 'athlete-select-trigger';
+    trigger.type = 'button';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'trigger-name';
+    nameSpan.textContent = 'Select athlete…';
+
+    const arrow = document.createElement('span');
+    arrow.className = 'trigger-arrow';
+    arrow.textContent = '▼';
+
+    trigger.appendChild(nameSpan);
+    trigger.appendChild(arrow);
+    trigger.addEventListener('click', e => { e.stopPropagation(); openDropdown(gender, i, trigger, athletes); });
+
+    wrapper.appendChild(trigger);
+    row.appendChild(badge);
+    row.appendChild(wrapper);
+    grid.appendChild(row);
+  }
+}
+
+// ── DROPDOWN ──────────────────────────────────────────────────────────────────
+function openDropdown(gender, posIdx, triggerEl, athletes) {
+  if (activeDropdown && activeDropdown.gender === gender && activeDropdown.posIdx === posIdx) { closeDropdown(); return; }
+  closeDropdown();
+
+  const portal = document.getElementById('dropdown-portal');
+  const rect = triggerEl.getBoundingClientRect();
+  portal.innerHTML = '';
+  portal.style.width = Math.max(250, rect.width + 80) + 'px';
+  portal.style.maxWidth = '320px';
+
+  const below = window.innerHeight - rect.bottom - 8;
+  const above = rect.top - 8;
+  if (below < 280 && above > below) {
+    portal.style.top = 'auto';
+    portal.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+  } else {
+    portal.style.top = (rect.bottom + 4) + 'px';
+    portal.style.bottom = 'auto';
+  }
+  portal.style.left = Math.min(rect.left, window.innerWidth - parseInt(portal.style.width) - 8) + 'px';
+
+  const searchBox = document.createElement('div');
+  searchBox.className = 'dropdown-search';
+  searchBox.innerHTML = '<span class="search-icon">⌕</span>';
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Search name or bib…';
+  searchInput.autocomplete = 'off';
+  searchBox.appendChild(searchInput);
+
+  const list = document.createElement('div');
+  list.className = 'dropdown-list';
+
+  const takenIds = new Set(state[gender].picks.filter((p, idx) => p !== null && idx !== posIdx).map(p => p.id));
+  const mentionCounts = getMentionCounts(gender);
+
+  function renderList(filter) {
+    list.innerHTML = '';
+    const lf = filter.toLowerCase();
+    const filtered = athletes.filter(a => a.name.toLowerCase().includes(lf) || a.bib.toString().includes(filter));
+    if (!filtered.length) { list.innerHTML = '<div class="no-results">No athletes found</div>'; return; }
+
+    const alpha = (a, b) => a.name.localeCompare(b.name, 'bg');
+    const favs = filtered.filter(a => mentionCounts.has(a.id)).sort(alpha);
+    const rest = filtered.filter(a => !mentionCounts.has(a.id)).sort(alpha);
+
+    function addOpt(a) {
+      const opt = document.createElement('div');
+      opt.className = 'dropdown-option';
+      if (takenIds.has(a.id)) opt.classList.add('disabled');
+      const cur = state[gender].picks[posIdx];
+      if (cur && cur.id === a.id) opt.classList.add('selected');
+      const count = mentionCounts.get(a.id);
+      const starHtml = count
+        ? `<span class="opt-star" title="${count}×mentioned">★<span class="opt-star-count">${count}</span></span>`
+        : `<span class="opt-star-empty">★</span>`;
+      opt.innerHTML = `${starHtml}<span class="opt-number">#${a.bib}</span><span>${a.name}</span><span class="opt-country">${a.country}</span>`;
+      opt.addEventListener('mousedown', e => { e.preventDefault(); selectAthlete(gender, posIdx, a); closeDropdown(); });
+      list.appendChild(opt);
+    }
+
+    if (favs.length && !filter) {
+      const l1 = document.createElement('div'); l1.className = 'dropdown-section-label'; l1.textContent = '★ mentioned in predictions'; list.appendChild(l1);
+      favs.forEach(addOpt);
+      if (rest.length) {
+        const l2 = document.createElement('div'); l2.className = 'dropdown-section-label'; l2.textContent = 'all athletes'; list.appendChild(l2);
+        rest.forEach(addOpt);
+      }
+    } else {
+      filtered.sort(alpha).forEach(addOpt);
+    }
+  }
+
+  renderList('');
+  searchInput.addEventListener('input', () => renderList(searchInput.value));
+  portal.appendChild(searchBox);
+  portal.appendChild(list);
+  portal.classList.add('open');
+
+  const arrow = triggerEl.querySelector('.trigger-arrow');
+  if (arrow) arrow.classList.add('open');
+  activeDropdown = { gender, posIdx, triggerEl, arrow };
+  requestAnimationFrame(() => searchInput.focus());
+}
+
+function closeDropdown() {
+  if (!activeDropdown) return;
+  document.getElementById('dropdown-portal').classList.remove('open');
+  if (activeDropdown.arrow) activeDropdown.arrow.classList.remove('open');
+  activeDropdown = null;
+}
+
+document.addEventListener('click', e => { if (!document.getElementById('dropdown-portal').contains(e.target)) closeDropdown(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); closeModal(); } });
+window.addEventListener('scroll', () => {
+  if (!activeDropdown) return;
+  // Reposition dropdown instead of closing it
+  const { triggerEl } = activeDropdown;
+  const portal = document.getElementById('dropdown-portal');
+  const rect = triggerEl.getBoundingClientRect();
+  const below = window.innerHeight - rect.bottom - 8;
+  const above = rect.top - 8;
+  if (below < 280 && above > below) {
+    portal.style.top = 'auto';
+    portal.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+  } else {
+    portal.style.top = (rect.bottom + 4) + 'px';
+    portal.style.bottom = 'auto';
+  }
+  portal.style.left = Math.min(rect.left, window.innerWidth - parseInt(portal.style.width) - 8) + 'px';
+}, true);
+
+function selectAthlete(gender, posIdx, a) {
+  state[gender].picks[posIdx] = a;
+  const row = document.getElementById(`row-${gender}-${posIdx}`);
+  const ns = row.querySelector('.trigger-name');
+  ns.textContent = `#${a.bib} ${a.name} ${a.country}`;
+  ns.classList.add('selected');
+  updatePickedCount(gender);
+}
+
+function updatePickedCount(gender) {
+  const n = state[gender].picks.filter(p => p !== null).length;
+  document.getElementById(`${gender}-picked-count`).textContent = `${n} / 10 picked`;
+}
+
+function togglePositions(gender) {
+  const grid = document.getElementById(`positions-${gender}`);
+  const btn = grid.parentElement.querySelector('.show-more-btn');
+  const c = grid.classList.toggle('positions-collapsed');
+  btn.textContent = c ? 'show up to 10' : 'show less';
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+function getTime(gender) {
+  const h = parseInt(document.getElementById(`${gender}-h`).value) || 0;
+  const m = parseInt(document.getElementById(`${gender}-m`).value) || 0;
+  const s = parseInt(document.getElementById(`${gender}-s`).value) || 0;
+  if (!h && !m && !s) return null;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function submitPrediction() {
+  const mp = state.men.picks;
+  const wp = state.women.picks;
+  let errors = [];
+
+  // Validate name
+  const nameEl = document.getElementById('submitter-name');
+  const submitterName = nameEl.value.trim();
+  if (!submitterName) {
+    errors.push('name');
+    nameEl.classList.add('required-error');
+    setTimeout(() => nameEl.classList.remove('required-error'), 600);
+  }
+
+  // Validate top-3 picks for men
+  for (let i = 0; i < 3; i++) {
+    if (!mp[i]) {
+      errors.push(`men-pick-${i}`);
+      document.getElementById(`row-men-${i}`).classList.add('required-error');
+      setTimeout(() => document.getElementById(`row-men-${i}`).classList.remove('required-error'), 600);
+    }
+  }
+  // Validate top-3 picks for women
+  for (let i = 0; i < 3; i++) {
+    if (!wp[i]) {
+      errors.push(`women-pick-${i}`);
+      document.getElementById(`row-women-${i}`).classList.add('required-error');
+      setTimeout(() => document.getElementById(`row-women-${i}`).classList.remove('required-error'), 600);
+    }
+  }
+
+  // Validate men's time
+  const menTime = getTime('men');
+  if (!menTime) {
+    errors.push('men-time');
+    ['men-h','men-m','men-s'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.add('required-error');
+      setTimeout(() => el.classList.remove('required-error'), 600);
+    });
+  }
+  // Validate women's time
+  const womenTime = getTime('women');
+  if (!womenTime) {
+    errors.push('women-time');
+    ['women-h','women-m','women-s'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.add('required-error');
+      setTimeout(() => el.classList.remove('required-error'), 600);
+    });
+  }
+
+  if (errors.length) {
+    const msgs = [];
+    if (errors.includes('name')) msgs.push('your name');
+    const menPickErrors = errors.filter(e => e.startsWith('men-pick')).length;
+    const womenPickErrors = errors.filter(e => e.startsWith('women-pick')).length;
+    if (menPickErrors) msgs.push(`men's top ${menPickErrors === 1 ? posLabel(mp.findIndex(p => !p)) : '3'}`);
+    if (womenPickErrors) msgs.push(`women's top ${womenPickErrors === 1 ? posLabel(wp.findIndex(p => !p)) : '3'}`);
+    if (errors.includes('men-time')) msgs.push("men's winner time");
+    if (errors.includes('women-time')) msgs.push("women's winner time");
+    showErrorToast('Please fill in: ' + msgs.join(', ') + '.');
+    return;
+  }
+
+  const now = new Date();
+  const palette = nameToPalette(submitterName);
+  const at = now.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' · ' + now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  const newPred = {
+    _user: true,
+    id: Date.now(),
+    author: { name: submitterName, initials: nameToInitials(submitterName), bg: palette.bg, fg: palette.fg, location: at, at },
+    men:   { picks: [...state.men.picks],   time: menTime },
+    women: { picks: [...state.women.picks], time: womenTime }
+  };
+  predictions.unshift(newPred);
+  saveToStorage(predictions);
+  renderPredictionCards();
+  showToast('✓ Prediction submitted!');
+  state.men.picks = Array(10).fill(null);
+  state.women.picks = Array(10).fill(null);
+  buildPositionsGrid('men');
+  buildPositionsGrid('women');
+  updatePickedCount('men');
+  updatePickedCount('women');
+  ['men-h','men-m','men-s','women-h','women-m','women-s'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('submitter-name').value = '';
+}
+
+// ── RENDER CARDS ──────────────────────────────────────────────────────────────
+function renderPredictionCards() {
+  const container = document.getElementById('predictions-container');
+  document.getElementById('total-predictions-count').textContent = `${predictions.length} prediction${predictions.length !== 1 ? 's' : ''}`;
+  if (!predictions.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏔</div>No predictions yet. Be the first!</div>'; return; }
+
+  const wrap = document.createElement('div');
+  wrap.className = 'pred-cards';
+
+  predictions.forEach((p, idx) => {
+    const mp = p.men.picks;
+    const wp = p.women.picks;
+
+    function picksBlock(picks, time, gClass, label) {
+      const rows = picks.map((a, i) => a ? `
+        <div class="pick-row">
+          <span class="pick-pos">${posLabel(i)}</span>
+          <span class="pick-medal">${medal(i)}</span>
+          <span class="pick-name${i < 3 ? ' top' : ''}">${a.name} ${a.country}</span>
+        </div>` : '').filter(Boolean).join('');
+      const timeHtml = time ? `<div class="pick-time-lbl">predicted time</div><div class="pick-time">${time}</div>` : '<div class="pick-no-time">No time prediction</div>';
+      return `<div class="pred-detail-col"><h4 class="${gClass}">${label}</h4><div class="pick-list">${rows}</div>${timeHtml}</div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'pred-card';
+    card.innerHTML = `
+      <div class="pred-card-header" data-idx="${idx}">
+        <div class="pred-avatar" style="background:${p.author.bg};color:${p.author.fg}">${p.author.initials}</div>
+        <div class="pred-author-info">
+          <div class="pred-author-name">${p.author.name}</div>
+          <div class="pred-author-meta">${p.author.location} · ${p.author.at}</div>
+        </div>
+        <div class="pred-quick">
+          <div class="pred-quick-item"><span class="pred-quick-label">♂ 1st</span><span class="pred-quick-val">${mp[0] ? mp[0].name.split(' ')[0] : '—'}</span></div>
+          <div class="pred-quick-item"><span class="pred-quick-label">♀ 1st</span><span class="pred-quick-val">${wp[0] ? wp[0].name.split(' ')[0] : '—'}</span></div>
+        </div>
+        <span class="pred-chevron">▶</span>
+      </div>
+      <div class="pred-card-body">
+        <div class="pred-detail-cols">
+          ${picksBlock(mp, p.men.time, 'men-h', '♂ Men\'s picks')}
+          ${picksBlock(wp, p.women.time, 'women-h', '♀ Women\'s picks')}
+        </div>
+        <button class="btn-full-detail" data-modal="${idx}">view full prediction ↗</button>
+        <div style="clear:both"></div>
+      </div>`;
+
+    card.querySelector('.pred-card-header').addEventListener('click', () => { card.classList.toggle('open'); });
+    card.querySelector('.btn-full-detail').addEventListener('click', e => { e.stopPropagation(); openModal(idx); });
+    wrap.appendChild(card);
+  });
+
+  container.innerHTML = '';
+  container.appendChild(wrap);
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(idx) {
+  const p = predictions[idx];
+
+  document.getElementById('modal-header').innerHTML = `
+    <div class="modal-avatar" style="background:${p.author.bg};color:${p.author.fg}">${p.author.initials}</div>
+    <div>
+      <div class="modal-author-name">${p.author.name}</div>
+      <div class="modal-author-sub">${p.author.location} · ${p.author.at}</div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">✕</button>`;
+
+  function colHtml(picks, time, gClass, label) {
+    const rows = picks.map((a, i) => a ? `
+      <div class="modal-pick-row">
+        <span class="modal-pick-pos">${posLabel(i)}</span>
+        <span class="modal-pick-medal">${medal(i)}</span>
+        <span class="modal-pick-name${i < 3 ? ' top' : ''}">${a.name}</span>
+        <span class="modal-pick-country">${a.country}</span>
+      </div>` : '').filter(Boolean).join('');
+    const timeHtml = time
+      ? `<div class="modal-time-box"><span class="modal-time-val">${time}</span><span class="modal-time-label">predicted finish</span></div>`
+      : `<div class="modal-no-time">No time prediction submitted</div>`;
+    return `<div class="modal-col"><h4 class="${gClass}">${label}</h4><div class="modal-pick-rows">${rows}</div>${timeHtml}</div>`;
+  }
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-cols">
+      ${colHtml(p.men.picks, p.men.time, 'men-h', '♂ Men\'s top 10')}
+      ${colHtml(p.women.picks, p.women.time, 'women-h', '♀ Women\'s top 10')}
+    </div>`;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function handleOverlayClick(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.classList.remove('error');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showErrorToast(msg) {
+  const t = document.getElementById('toast');
+  t.classList.add('error');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => { t.classList.remove('show'); t.classList.remove('error'); }, 4000);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildPositionsGrid('men');
+buildPositionsGrid('women');
+renderPredictionCards();
+</script>
+</body>
+</html>
