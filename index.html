@@ -55,8 +55,7 @@
   .winner-time-block { margin-bottom: 20px; }
   .field-label { font-size: 12px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: block; }
   .time-inputs { display: flex; align-items: center; gap: 6px; }
-  .time-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono); font-size: 18px; text-align: center; padding: 8px 6px; border-radius: 8px; width: 52px; outline: none; -moz-appearance: textfield; transition: border-color 0.15s; }
-  .time-input::-webkit-outer-spin-button, .time-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .time-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono); font-size: 18px; text-align: center; padding: 8px 6px; border-radius: 8px; width: 52px; outline: none; transition: border-color 0.15s; }
   .time-input:focus { border-color: var(--green); }
   .time-input.required-error { border-color: #e05a5a; animation: shake 0.3s ease; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
@@ -164,7 +163,7 @@
   .pick-name.top { color: var(--text); font-weight: 500; }
   .pick-time { margin-top: 10px; font-family: var(--font-mono); font-size: 15px; color: var(--green); }
   .pick-no-time { margin-top: 8px; font-size: 12px; color: var(--text3); font-style: italic; }
-  .pick-time-lbl { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 10px; }
+  .pick-time-lbl { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px; margin-bottom: 2px; }
 
   .btn-full-detail { background: none; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; padding: 5px 14px; border-radius: 100px; cursor: pointer; transition: color 0.12s, border-color 0.12s; margin-top: 14px; float: right; }
   .btn-full-detail:hover { color: var(--text); border-color: var(--green); }
@@ -202,6 +201,80 @@
   .modal-no-time { margin-top: 10px; color: var(--text3); font-size: 13px; font-style: italic; }
   .modal-divider { height: 1px; background: var(--border); margin: 20px 0; display: none; }
   @media (max-width: 520px) { .modal-divider { display: block; } }
+
+  /* ── SCORING ── */
+  .results-banner { background: var(--surface); border: 1px solid rgba(141,198,63,0.25); border-radius: 14px; padding: 20px 24px; margin-bottom: 32px; }
+  .results-banner-header { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+  .results-banner-header:hover h3 { color: var(--green2); }
+  .results-chevron { margin-left: auto; font-size: 11px; color: var(--text3); transition: transform 0.25s; }
+  .results-banner.open .results-chevron { transform: rotate(90deg); }
+  .results-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease, margin-top 0.3s ease; margin-top: 0; }
+  .results-banner.open .results-body { max-height: 800px; margin-top: 16px; }
+  .results-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(141,198,63,0.12); border: 1px solid rgba(141,198,63,0.3); color: var(--green2); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .results-pill::before { content: '✓'; font-size: 10px; }
+  .results-banner h3 { font-family: var(--font-display); font-size: 20px; }
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
+  .results-col h4 { font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .results-col h4.men-h { color: #7ab8f5; }
+  .results-col h4.women-h { color: #e896b8; }
+  .result-row { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .result-row:last-child { border-bottom: none; }
+  .result-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); min-width: 26px; }
+  .result-name { flex: 1; color: var(--text2); }
+  .result-name.top { color: var(--text); font-weight: 500; }
+  .result-time-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .result-time-lbl { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; }
+  .result-time-val { font-family: var(--font-mono); font-size: 15px; color: var(--green); }
+
+  .score-badge { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 100px; border: 1px solid; flex-shrink: 0; }
+  .score-badge.gold   { background: rgba(232,168,48,0.12); color: #e8a830; border-color: rgba(232,168,48,0.3); }
+  .score-badge.silver { background: rgba(180,180,200,0.1); color: #b0b8cc; border-color: rgba(180,180,200,0.25); }
+  .score-badge.bronze { background: rgba(180,110,60,0.1);  color: #c87a48; border-color: rgba(180,110,60,0.25); }
+  .score-badge.plain  { background: var(--surface2); color: var(--text2); border-color: var(--border); }
+  .score-badge .score-pts { opacity: 0.6; font-size: 10px; }
+
+  .leaderboard { margin-top: 32px; margin-bottom: 16px; }
+  .leaderboard-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 14px; }
+  .lb-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .lb-row { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: var(--surface2); }
+  .lb-rank { font-family: var(--font-mono); font-size: 13px; min-width: 24px; color: var(--text3); }
+  .lb-rank.r1 { color: #e8a830; }
+  .lb-rank.r2 { color: #b0b8cc; }
+  .lb-rank.r3 { color: #c87a48; }
+  .lb-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; flex-shrink: 0; }
+  .lb-name { flex: 1; font-size: 14px; font-weight: 500; }
+  .lb-breakdown { font-size: 11px; font-family: var(--font-mono); color: var(--text3); }
+  .lb-score { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--green2); min-width: 52px; text-align: right; }
+
+  .score-breakdown { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+  .score-breakdown-title { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .score-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+  .score-cat { display: flex; align-items: center; gap: 5px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 11px; font-family: var(--font-mono); }
+  .score-cat-label { color: var(--text3); }
+  .score-cat-val { color: var(--text); font-weight: 500; }
+  .score-cat-max { color: var(--text3); font-size: 10px; }
+
+  /* per-pick point chips */
+  .pick-row { position: relative; }
+  .pick-pts { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .pick-pts.pts-exact  { background: rgba(141,198,63,0.15); color: #8dc63f; border: 1px solid rgba(141,198,63,0.3); }
+  .pick-pts.pts-close  { background: rgba(141,198,63,0.08); color: #7ab870; border: 1px solid rgba(141,198,63,0.18); }
+  .pick-pts.pts-near   { background: rgba(232,168,48,0.12);  color: #e8a830; border: 1px solid rgba(232,168,48,0.25); }
+  .pick-pts.pts-far    { background: rgba(232,168,48,0.06);  color: #b88020; border: 1px solid rgba(232,168,48,0.15); }
+  .pick-pts.pts-miss   { background: rgba(224,90,90,0.08);   color: #c05050; border: 1px solid rgba(224,90,90,0.18); }
+  .pick-pts-tooltip    { position: absolute; bottom: calc(100% + 4px); right: 0; background: var(--bg2); border: 1px solid var(--border2); border-radius: 7px; padding: 5px 9px; font-size: 11px; font-family: var(--font-mono); color: var(--text2); white-space: nowrap; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.15s; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+  .pick-row:hover .pick-pts-tooltip { opacity: 1; }
+
+  /* modal pick pts */
+  .modal-pick-pts { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .modal-pick-pts.pts-exact { background: rgba(141,198,63,0.15); color: #8dc63f; border: 1px solid rgba(141,198,63,0.3); }
+  .modal-pick-pts.pts-close { background: rgba(141,198,63,0.08); color: #7ab870; border: 1px solid rgba(141,198,63,0.18); }
+  .modal-pick-pts.pts-near  { background: rgba(232,168,48,0.12);  color: #e8a830; border: 1px solid rgba(232,168,48,0.25); }
+  .modal-pick-pts.pts-far   { background: rgba(232,168,48,0.06);  color: #b88020; border: 1px solid rgba(232,168,48,0.15); }
+  .modal-pick-pts.pts-miss  { background: rgba(224,90,90,0.08);   color: #c05050; border: 1px solid rgba(224,90,90,0.18); }
 </style>
 </head>
 <body>
@@ -236,11 +309,11 @@
         <div class="winner-time-block">
           <label class="field-label">Predicted winner time <span style="color:var(--amber)">✦ Required</span></label>
           <div class="time-inputs">
-            <div><input class="time-input" type="number" id="men-h" min="0" max="99" placeholder="HH"><div class="time-unit">h</div></div>
+            <div><input class="time-input" type="text" id="men-h" maxlength="2" inputmode="numeric" placeholder="HH" autocomplete="off"><div class="time-unit">h</div></div>
             <span class="time-sep">:</span>
-            <div><input class="time-input" type="number" id="men-m" min="0" max="59" placeholder="MM"><div class="time-unit">min</div></div>
+            <div><input class="time-input" type="text" id="men-m" maxlength="2" inputmode="numeric" placeholder="MM" autocomplete="off"><div class="time-unit">min</div></div>
             <span class="time-sep">:</span>
-            <div><input class="time-input" type="number" id="men-s" min="0" max="59" placeholder="SS"><div class="time-unit">sec</div></div>
+            <div><input class="time-input" type="text" id="men-s" maxlength="2" inputmode="numeric" placeholder="SS" autocomplete="off"><div class="time-unit">sec</div></div>
           </div>
         </div>
         <div class="positions-header">
@@ -263,11 +336,11 @@
         <div class="winner-time-block">
           <label class="field-label">Predicted winner time <span style="color:var(--amber)">✦ Required</span></label>
           <div class="time-inputs">
-            <div><input class="time-input" type="number" id="women-h" min="0" max="99" placeholder="HH"><div class="time-unit">h</div></div>
+            <div><input class="time-input" type="text" id="women-h" maxlength="2" inputmode="numeric" placeholder="HH" autocomplete="off"><div class="time-unit">h</div></div>
             <span class="time-sep">:</span>
-            <div><input class="time-input" type="number" id="women-m" min="0" max="59" placeholder="MM"><div class="time-unit">min</div></div>
+            <div><input class="time-input" type="text" id="women-m" maxlength="2" inputmode="numeric" placeholder="MM" autocomplete="off"><div class="time-unit">min</div></div>
             <span class="time-sep">:</span>
-            <div><input class="time-input" type="number" id="women-s" min="0" max="59" placeholder="SS"><div class="time-unit">sec</div></div>
+            <div><input class="time-input" type="text" id="women-s" maxlength="2" inputmode="numeric" placeholder="SS" autocomplete="off"><div class="time-unit">sec</div></div>
           </div>
         </div>
         <div class="positions-header">
@@ -294,6 +367,24 @@
   </div>
 
   <div class="divider"></div>
+
+  <!-- RACE RESULTS BANNER -->
+  <div class="results-banner" id="results-banner">
+    <div class="results-banner-header" onclick="document.getElementById('results-banner').classList.toggle('open')">
+      <span class="results-pill">Official Results</span>
+      <h3>Vitosha 100 · 2026</h3>
+      <span class="results-chevron">▶</span>
+    </div>
+    <div class="results-body">
+      <div class="results-grid" id="results-grid"></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="leaderboard">
+    <div class="leaderboard-title">🏆 Prediction Leaderboard</div>
+    <div class="lb-table" id="leaderboard-table"></div>
+  </div>
 
   <div class="predictions-section">
     <div class="predictions-header">
@@ -400,7 +491,41 @@ function loadFromStorage() {
   } catch(e) { return []; }
 }
 
-const predictions = loadFromStorage();
+const HARDCODED_PREDICTION = {
+  _hardcoded: true,
+  author: { name: 'Явор Г.', initials: 'ЯГ', location: 'София', at: 'преди старта', bg: '#2a3f1a', fg: '#8dc63f' },
+  men: {
+    time: '7:05:00',
+    picks: [
+      { id: 'm1',  name: 'Христо Цветков',     country: '🇧🇬' },
+      { id: 'm2',  name: 'Димитър Шадура',     country: '🇧🇬' },
+      { id: 'm3',  name: 'Пламен Пенов',       country: '🇧🇬' },
+      { id: 'm7',  name: 'Александър Христов', country: '🇧🇬' },
+      { id: 'm6',  name: 'Николай Стойчев',    country: '🇧🇬' },
+      { id: 'm9',  name: 'Антон Кадиев',       country: '🇧🇬' },
+      { id: 'm11', name: 'Стилян Аврамов',     country: '🇧🇬' },
+      { id: 'm12', name: 'Христо Минков',      country: '🇧🇬' },
+      { id: 'm14', name: 'Андриан Кърпаров',   country: '🇧🇬' },
+      { id: 'm10', name: 'Атанас Парашкевов',  country: '🇧🇬' },
+    ]
+  },
+  women: {
+    time: '8:50:00',
+    picks: [
+      { id: 'w2', name: 'Моника Филипова', country: '🇧🇬' },
+      { id: 'w1', name: 'Мария Николова',  country: '🇧🇬' },
+      { id: 'w4', name: 'Полина Горасова', country: '🇧🇬' },
+    ]
+  }
+};
+
+function loadPredictions() {
+  const stored = loadFromStorage();
+  // ensure hardcoded is always first and not duplicated
+  return [HARDCODED_PREDICTION, ...stored.filter(p => !p._hardcoded)];
+}
+
+const predictions = loadPredictions();
 
 // ── MENTION COUNTS: how many times each athlete appears in predictions ────────
 function getMentionCounts(gender) {
@@ -638,7 +763,51 @@ function submitPrediction() {
   const menTime = getTime('men');
   if (!menTime) {
     errors.push('men-time');
-    ['men-h','men-m','men-s'].forEach(id => {
+    // time input enforcement — only digits, max 2 chars, hard value clamp
+  [
+    { id: 'men-h',   max: 19 },
+    { id: 'men-m',   max: 59 },
+    { id: 'men-s',   max: 59 },
+    { id: 'women-h', max: 19 },
+    { id: 'women-m', max: 59 },
+    { id: 'women-s', max: 59 },
+  ].forEach(({ id, max }) => {
+    const el = document.getElementById(id);
+
+    function enforce() {
+      // strip non-digits
+      let val = el.value.replace(/[^0-9]/g, '');
+      // clamp to max
+      if (val !== '') {
+        const n = parseInt(val, 10);
+        if (n > max) val = String(max);
+      }
+      if (el.value !== val) el.value = val;
+    }
+
+    el.addEventListener('keydown', function(e) {
+      // allow control keys
+      if (e.ctrlKey || e.metaKey) return;
+      if (['Backspace','Delete','Tab','ArrowLeft','ArrowRight'].includes(e.key)) return;
+      // block non-digits
+      if (!/^[0-9]$/.test(e.key)) { e.preventDefault(); return; }
+      // block if adding this digit would exceed max
+      const sel = this.value.slice(0, this.selectionStart) + e.key + this.value.slice(this.selectionEnd);
+      const stripped = sel.replace(/[^0-9]/g, '').slice(0, 2);
+      if (parseInt(stripped, 10) > max) { e.preventDefault(); }
+    });
+
+    el.addEventListener('input', enforce);
+    el.addEventListener('blur',  enforce);
+    el.addEventListener('paste', function(e) {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 2);
+      const n = parseInt(pasted, 10);
+      this.value = isNaN(n) ? '' : String(Math.min(max, n));
+    });
+  });
+
+  ['men-h','men-m','men-s'].forEach(id => {
       const el = document.getElementById(id);
       el.classList.add('required-error');
       setTimeout(() => el.classList.remove('required-error'), 600);
@@ -681,6 +850,7 @@ function submitPrediction() {
   predictions.unshift(newPred);
   saveToStorage(predictions);
   renderPredictionCards();
+  renderLeaderboard();
   showToast('✓ Prediction submitted!');
   state.men.picks = Array(10).fill(null);
   state.women.picks = Array(10).fill(null);
@@ -701,19 +871,44 @@ function renderPredictionCards() {
   const wrap = document.createElement('div');
   wrap.className = 'pred-cards';
 
+  // Build score ranks once for this render cycle
+  const _scoredAll = predictions.map(p => ({ p, score: scorePrediction(p) }));
+  _scoredAll.sort((a, b) => b.score.total - a.score.total);
+  const _rankMap = new Map(_scoredAll.map(({p}, i) => [p, i]));
+
   predictions.forEach((p, idx) => {
     const mp = p.men.picks;
     const wp = p.women.picks;
+    const score = scorePrediction(p);
+    const rank  = _rankMap.get(p) ?? 99;
 
-    function picksBlock(picks, time, gClass, label) {
-      const rows = picks.map((a, i) => a ? `
-        <div class="pick-row">
+    function picksBlock(picks, time, gClass, label, resultFinishers) {
+      const actualPos = new Map(); resultFinishers.forEach((a, i) => actualPos.set(a.id, i));
+      const rows = picks.map((a, i) => {
+        if (!a) return '';
+        const slotMax = i < 3 ? W_TOP3 : W_LOW;
+        let tier = 'miss', dist = null, earned = 0, tooltipText = 'not in top 10 — 0 pts';
+        if (actualPos.has(a.id)) {
+          const ap = actualPos.get(a.id);
+          dist = Math.abs(ap - i);
+          const frac = proximityFraction(dist);
+          earned = slotMax * frac;
+          tier = pickTier(dist, true);
+          const label2 = pickTierLabel(dist, true);
+          tooltipText = `${label2} · ${earned.toFixed(1)} / ${slotMax.toFixed(1)} pts (${Math.round(frac*100)}%)`;
+        }
+        const ptsLabel = earned > 0 ? `+${earned.toFixed(1)}` : '0';
+        const ptsChip = `<span class="pick-pts pts-${tier}">${ptsLabel}</span>
+          <span class="pick-pts-tooltip">${tooltipText}</span>`;
+        return `<div class="pick-row">
           <span class="pick-pos">${posLabel(i)}</span>
           <span class="pick-medal">${medal(i)}</span>
           <span class="pick-name${i < 3 ? ' top' : ''}">${a.name} ${a.country}</span>
-        </div>` : '').filter(Boolean).join('');
+          ${ptsChip}
+        </div>`;
+      }).filter(Boolean).join('');
       const timeHtml = time ? `<div class="pick-time-lbl">predicted time</div><div class="pick-time">${time}</div>` : '<div class="pick-no-time">No time prediction</div>';
-      return `<div class="pred-detail-col"><h4 class="${gClass}">${label}</h4><div class="pick-list">${rows}</div>${timeHtml}</div>`;
+      return `<div class="pred-detail-col"><h4 class="${gClass}">${label}</h4>${timeHtml}<div class="pick-list">${rows}</div></div>`;
     }
 
     const card = document.createElement('div');
@@ -728,13 +923,14 @@ function renderPredictionCards() {
         <div class="pred-quick">
           <div class="pred-quick-item"><span class="pred-quick-label">♂ 1st</span><span class="pred-quick-val">${mp[0] ? mp[0].name.split(' ')[0] : '—'}</span></div>
           <div class="pred-quick-item"><span class="pred-quick-label">♀ 1st</span><span class="pred-quick-val">${wp[0] ? wp[0].name.split(' ')[0] : '—'}</span></div>
+          ${scoreBadgeHtml(score, rank)}
         </div>
         <span class="pred-chevron">▶</span>
       </div>
       <div class="pred-card-body">
         <div class="pred-detail-cols">
-          ${picksBlock(mp, p.men.time, 'men-h', '♂ Men\'s picks')}
-          ${picksBlock(wp, p.women.time, 'women-h', '♀ Women\'s picks')}
+          ${picksBlock(mp, p.men.time, 'men-h', '♂ Men\'s picks', RACE_RESULTS.men.finishers)}
+          ${picksBlock(wp, p.women.time, 'women-h', '♀ Women\'s picks', RACE_RESULTS.women.finishers)}
         </div>
         <button class="btn-full-detail" data-modal="${idx}">view full prediction ↗</button>
         <div style="clear:both"></div>
@@ -761,24 +957,37 @@ function openModal(idx) {
     </div>
     <button class="modal-close" onclick="closeModal()">✕</button>`;
 
-  function colHtml(picks, time, gClass, label) {
-    const rows = picks.map((a, i) => a ? `
-      <div class="modal-pick-row">
+  function colHtml(picks, time, gClass, label, resultFinishers) {
+    const actualPos = new Map(); resultFinishers.forEach((a, i) => actualPos.set(a.id, i));
+    const rows = picks.map((a, i) => {
+      if (!a) return '';
+      const slotMax = i < 3 ? W_TOP3 : W_LOW;
+      let tier = 'miss', earned = 0, dist = null;
+      if (actualPos.has(a.id)) {
+        const ap = actualPos.get(a.id);
+        dist = Math.abs(ap - i);
+        earned = slotMax * proximityFraction(dist);
+        tier = pickTier(dist, true);
+      }
+      const ptsLabel = earned > 0 ? `+${earned.toFixed(1)}` : '0';
+      return `<div class="modal-pick-row">
         <span class="modal-pick-pos">${posLabel(i)}</span>
         <span class="modal-pick-medal">${medal(i)}</span>
         <span class="modal-pick-name${i < 3 ? ' top' : ''}">${a.name}</span>
         <span class="modal-pick-country">${a.country}</span>
-      </div>` : '').filter(Boolean).join('');
+        <span class="modal-pick-pts pts-${tier}" title="${pickTierLabel(dist, dist !== null)} · ${earned.toFixed(1)}/${slotMax.toFixed(1)}">${ptsLabel}</span>
+      </div>`;
+    }).filter(Boolean).join('');
     const timeHtml = time
       ? `<div class="modal-time-box"><span class="modal-time-val">${time}</span><span class="modal-time-label">predicted finish</span></div>`
       : `<div class="modal-no-time">No time prediction submitted</div>`;
-    return `<div class="modal-col"><h4 class="${gClass}">${label}</h4><div class="modal-pick-rows">${rows}</div>${timeHtml}</div>`;
+    return `<div class="modal-col"><h4 class="${gClass}">${label}</h4>${timeHtml}<div class="modal-pick-rows">${rows}</div></div>`;
   }
 
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-cols">
-      ${colHtml(p.men.picks, p.men.time, 'men-h', '♂ Men\'s top 10')}
-      ${colHtml(p.women.picks, p.women.time, 'women-h', '♀ Women\'s top 10')}
+      ${colHtml(p.men.picks, p.men.time, 'men-h', '♂ Men\'s top 10', RACE_RESULTS.men.finishers)}
+      ${colHtml(p.women.picks, p.women.time, 'women-h', '♀ Women\'s top 10', RACE_RESULTS.women.finishers)}
     </div>`;
 
   document.getElementById('modal-overlay').classList.add('open');
@@ -804,10 +1013,197 @@ function showErrorToast(msg) {
   setTimeout(() => { t.classList.remove('show'); t.classList.remove('error'); }, 4000);
 }
 
+
+// ── OFFICIAL RESULTS (dummy data) ────────────────────────────────────────────
+const RACE_RESULTS = {
+  men: {
+    finishers: [
+      { id: 'm1',  name: 'Христо Цветков',      country: '🇧🇬' },
+      { id: 'm4',  name: 'Александър Спасов',   country: '🇧🇬' },
+      { id: 'm24', name: 'Julien Feutrie',       country: '🇫🇷' },
+      { id: 'm0',  name: 'Боян Иванджиков',      country: '🇧🇬' },
+      { id: 'm8',  name: 'Даниел Кубашлиев',    country: '🇧🇬' },
+      { id: 'm15', name: 'Андрей Гридин',        country: '🇧🇬' },
+      { id: 'm3',  name: 'Пламен Пенов',         country: '🇧🇬' },
+      { id: 'm20', name: 'Росен Русев',          country: '🇧🇬' },
+      { id: 'm11', name: 'Стилян Аврамов',       country: '🇧🇬' },
+      { id: 'm6',  name: 'Николай Стойчев',      country: '🇧🇬' },
+    ],
+    winnerTime: '12:34:18'
+  },
+  women: {
+    finishers: [
+      { id: 'w3', name: 'Надежда Ангелова',  country: '🇧🇬' },
+      { id: 'w1', name: 'Мария Николова',    country: '🇧🇬' },
+      { id: 'w5', name: 'Антония Георгиева', country: '🇧🇬' },
+      { id: 'w6', name: 'Нели Петкова',      country: '🇧🇬' },
+      { id: 'w2', name: 'Моника Филипова',   country: '🇧🇬' },
+      { id: 'w7', name: 'Елеонора Григорова',country: '🇧🇬' },
+      { id: 'w4', name: 'Полина Горасова',   country: '🇧🇬' },
+    ],
+    winnerTime: '14:52:04'
+  }
+};
+
+// ── SCORING ENGINE ────────────────────────────────────────────────────────────
+// Weight design (max 110 pts):
+//   Men winner time      : 10 pts   (linear decay over 60 min)
+//   Women winner time    : 10 pts
+//   Men  top-3 picks     : 10 pts max each  (proximity decay by distance)
+//   Women top-3 picks    : 10 pts max each
+//   Men  positions 4-10  : ~4.3 pts max each (group total = 30, same as top-3)
+//   Women positions 4-10 : ~4.3 pts max each
+//
+// Proximity scale (fraction of slot max, based on |predicted - actual| distance):
+//   dist 0  → 1.00  (exact)
+//   dist 1  → 0.75  (one off)
+//   dist 2  → 0.55  (two off)
+//   dist 3  → 0.35  (three off)
+//   dist 4  → 0.18  (four off)
+//   dist 5+ → 0.07  (still in top-10 but way off)
+//   not in top-10 → 0
+const W_TOP3  = 10;
+const W_LOW   = 30 / 7;
+const W_TIME  = 10;
+const MAX_TIME_DIFF_MINS = 60;
+
+const PROXIMITY_SCALE = [1.00, 0.75, 0.55, 0.35, 0.18, 0.07];
+
+function proximityFraction(dist) {
+  if (dist < 0) return 0;
+  return PROXIMITY_SCALE[Math.min(dist, PROXIMITY_SCALE.length - 1)];
+}
+
+function pickTier(dist, inTop10) {
+  if (!inTop10) return 'miss';
+  if (dist === 0) return 'exact';
+  if (dist === 1) return 'close';
+  if (dist <= 3) return 'near';
+  return 'far';
+}
+
+function pickTierLabel(dist, inTop10) {
+  if (!inTop10) return 'not in top 10';
+  if (dist === 0) return 'exact!';
+  if (dist === 1) return `off by 1`;
+  if (dist <= 3) return `off by ${dist}`;
+  return `off by ${dist}`;
+}
+
+function timeToMins(t) {
+  if (!t) return null;
+  const [h, m, s] = t.split(':').map(Number);
+  return h * 60 + m + s / 60;
+}
+
+function scoreTime(predicted, actual) {
+  if (!predicted || !actual) return 0;
+  const diff = Math.abs(timeToMins(predicted) - timeToMins(actual));
+  if (diff >= MAX_TIME_DIFF_MINS) return 0;
+  return W_TIME * (1 - diff / MAX_TIME_DIFF_MINS);
+}
+
+function scorePicks(picks, resultFinishers) {
+  const actualPos = new Map();
+  resultFinishers.forEach((a, i) => actualPos.set(a.id, i));
+  let pts = 0;
+  const detail = [];
+  picks.forEach((pick, predPos) => {
+    if (!pick) return;
+    const slotMax = predPos < 3 ? W_TOP3 : W_LOW;
+    if (!actualPos.has(pick.id)) {
+      detail.push({ predPos, pick, status: 'miss', tier: 'miss', dist: null, pts: 0, slotMax });
+      return;
+    }
+    const ap = actualPos.get(pick.id);
+    const dist = Math.abs(ap - predPos);
+    const frac = proximityFraction(dist);
+    const earned = slotMax * frac;
+    pts += earned;
+    detail.push({ predPos, pick, actualPos: ap, dist, status: dist === 0 ? 'exact' : 'near', tier: pickTier(dist, true), pts: earned, slotMax, frac });
+  });
+  return { pts, detail };
+}
+
+function scorePrediction(pred) {
+  const menPicks   = scorePicks(pred.men.picks,   RACE_RESULTS.men.finishers);
+  const womenPicks = scorePicks(pred.women.picks, RACE_RESULTS.women.finishers);
+  const menTime    = scoreTime(pred.men.time,   RACE_RESULTS.men.winnerTime);
+  const womenTime  = scoreTime(pred.women.time, RACE_RESULTS.women.winnerTime);
+  const total = menPicks.pts + womenPicks.pts + menTime + womenTime;
+  return {
+    total: Math.round(total * 10) / 10,
+    menPicks,
+    womenPicks,
+    menTime:   Math.round(menTime * 10) / 10,
+    womenTime: Math.round(womenTime * 10) / 10,
+  };
+}
+
+// ── RENDER RESULTS BANNER ─────────────────────────────────────────────────────
+function renderResultsBanner() {
+  const grid = document.getElementById('results-grid');
+  function colHtml(finishers, winnerTime, gClass, label) {
+    const rows = finishers.map((a, i) => `
+      <div class="result-row">
+        <span class="result-pos">${posLabel(i)}</span>
+        <span>${medal(i)}</span>
+        <span class="result-name${i < 3 ? ' top' : ''}">${a.name} ${a.country}</span>
+      </div>`).join('');
+    return `<div class="results-col">
+      <h4 class="${gClass}">${label}</h4>
+      <div class="result-time-row">
+        <span class="result-time-lbl">Winner time</span>
+        <span class="result-time-val">${winnerTime}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }
+  grid.innerHTML =
+    colHtml(RACE_RESULTS.men.finishers,   RACE_RESULTS.men.winnerTime,   'men-h',   '♂ Men') +
+    colHtml(RACE_RESULTS.women.finishers, RACE_RESULTS.women.winnerTime, 'women-h', '♀ Women');
+}
+
+// ── RENDER LEADERBOARD ────────────────────────────────────────────────────────
+function renderLeaderboard() {
+  const table = document.getElementById('leaderboard-table');
+  if (!predictions.length) {
+    table.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:14px;">No predictions yet.</div>';
+    return;
+  }
+  const scored = predictions.map(p => ({ p, score: scorePrediction(p) }));
+  scored.sort((a, b) => b.score.total - a.score.total);
+  const rankClass = i => ['r1','r2','r3'][i] || '';
+  const rankMedal = i => ['🥇','🥈','🥉'][i] || '';
+  table.innerHTML = scored.map(({ p, score }, i) => `
+    <div class="lb-row">
+      <span class="lb-rank ${rankClass(i)}">${rankMedal(i) || '#' + (i+1)}</span>
+      <div class="lb-avatar" style="background:${p.author.bg};color:${p.author.fg}">${p.author.initials}</div>
+      <span class="lb-name">${p.author.name}</span>
+      <span class="lb-breakdown">♂ ${score.menPicks.pts.toFixed(1)} &nbsp;♀ ${score.womenPicks.pts.toFixed(1)} &nbsp;⏱ ${(score.menTime+score.womenTime).toFixed(1)}</span>
+      <span class="lb-score">${score.total}<span style="font-size:10px;opacity:0.5"> /110</span></span>
+    </div>`).join('');
+}
+
+// ── SCORE BADGE ───────────────────────────────────────────────────────────────
+function getScoreRank(pred) {
+  const scored = predictions.map(p => ({ p, score: scorePrediction(p) }));
+  scored.sort((a, b) => b.score.total - a.score.total);
+  return scored.findIndex(s => s.p === pred || (s.p.id && s.p.id === pred.id));
+}
+
+function scoreBadgeHtml(score, rank) {
+  const cls  = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : 'plain';
+  const icon = rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : '🎯';
+  return `<span class="score-badge ${cls}" title="Score breakdown: ♂picks ${score.menPicks.pts.toFixed(1)} + ♀picks ${score.womenPicks.pts.toFixed(1)} + times ${(score.menTime+score.womenTime).toFixed(1)}">${icon} ${score.total}<span class="score-pts"> pts</span></span>`;
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 buildPositionsGrid('men');
 buildPositionsGrid('women');
+renderResultsBanner();
 renderPredictionCards();
+renderLeaderboard();
 </script>
 </body>
 </html>
