@@ -163,7 +163,8 @@
   .pick-name.top { color: var(--text); font-weight: 500; }
   .pick-time { margin-top: 10px; font-family: var(--font-mono); font-size: 15px; color: var(--green); }
   .pick-no-time { margin-top: 8px; font-size: 12px; color: var(--text3); font-style: italic; }
-  .pick-time-lbl { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px; margin-bottom: 2px; }
+  .pick-time-row { display: flex; align-items: baseline; gap: 12px; margin-top: 6px; margin-bottom: 14px; }
+  .pick-time-lbl { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
 
   .btn-full-detail { background: none; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; padding: 5px 14px; border-radius: 100px; cursor: pointer; transition: color 0.12s, border-color 0.12s; margin-top: 14px; float: right; }
   .btn-full-detail:hover { color: var(--text); border-color: var(--green); }
@@ -175,7 +176,7 @@
   /* MODAL */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 9998; display: none; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; width: 100%; max-width: 660px; max-height: 88vh; overflow-y: auto; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; width: 100%; max-width: 900px; max-height: 88vh; overflow-y: auto; }
   .modal-header { display: flex; align-items: center; gap: 14px; padding: 20px 24px 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg2); z-index: 1; }
   .modal-avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 17px; flex-shrink: 0; }
   .modal-author-name { font-weight: 600; font-size: 17px; }
@@ -189,15 +190,15 @@
   .modal-col h4.men-h { color: #7ab8f5; }
   .modal-col h4.women-h { color: #e896b8; }
   .modal-pick-rows { display: flex; flex-direction: column; gap: 5px; }
-  .modal-pick-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; background: var(--surface); border-radius: 8px; font-size: 13px; }
+  .modal-pick-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; background: var(--surface); border-radius: 8px; font-size: 13px; min-height: 36px; box-sizing: border-box; }
   .modal-pick-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); min-width: 28px; }
   .modal-pick-medal { font-size: 15px; min-width: 20px; }
   .modal-pick-name { flex: 1; color: var(--text2); }
   .modal-pick-name.top { color: var(--text); font-weight: 500; }
   .modal-pick-country { font-size: 14px; }
-  .modal-time-box { display: inline-flex; align-items: baseline; gap: 8px; background: var(--green-dim); border: 1px solid rgba(141,198,63,0.2); border-radius: 8px; padding: 8px 16px; margin-top: 12px; }
-  .modal-time-val { font-family: var(--font-mono); font-size: 20px; color: var(--green2); }
-  .modal-time-label { font-size: 12px; color: var(--text3); }
+  .modal-time-box { display: flex; align-items: baseline; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; width: 100%; box-sizing: border-box; }
+  .modal-time-val { font-family: var(--font-mono); font-size: 13px; color: var(--green2); }
+  .modal-time-label { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
   .modal-no-time { margin-top: 10px; color: var(--text3); font-size: 13px; font-style: italic; }
   .modal-divider { height: 1px; background: var(--border); margin: 20px 0; display: none; }
   @media (max-width: 520px) { .modal-divider { display: block; } }
@@ -257,8 +258,9 @@
   .score-cat-val { color: var(--text); font-weight: 500; }
   .score-cat-max { color: var(--text3); font-size: 10px; }
 
-  /* per-pick point chips */
   .pick-row { position: relative; }
+  .pick-row-empty { opacity: 0.45; }
+  .pick-name-empty { color: var(--text3); font-style: italic; }
   .pick-pts { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
   .pick-pts.pts-exact  { background: rgba(141,198,63,0.15); color: #8dc63f; border: 1px solid rgba(141,198,63,0.3); }
   .pick-pts.pts-close  { background: rgba(141,198,63,0.08); color: #7ab870; border: 1px solid rgba(141,198,63,0.18); }
@@ -267,6 +269,14 @@
   .pick-pts.pts-miss   { background: rgba(224,90,90,0.08);   color: #c05050; border: 1px solid rgba(224,90,90,0.18); }
   .pick-pts-tooltip    { position: absolute; bottom: calc(100% + 4px); right: 0; background: var(--bg2); border: 1px solid var(--border2); border-radius: 7px; padding: 5px 9px; font-size: 11px; font-family: var(--font-mono); color: var(--text2); white-space: nowrap; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.15s; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
   .pick-row:hover .pick-pts-tooltip { opacity: 1; }
+  .pick-pts-hoverable { position: relative; cursor: default; }
+  .pick-pts-tooltip-time { bottom: calc(100% + 4px); right: 0; }
+  .pick-pts-hoverable:hover .pick-pts-tooltip-time { opacity: 1; }
+  .pick-actual-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); margin-left: 4px; opacity: 0.8; }
+  .pick-actual-time { font-family: var(--font-mono); font-size: 10px; color: var(--text3); opacity: 0.75; }
+  .pick-actual-miss { color: #c05050; opacity: 0.7; }
+  .modal-actual-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); margin-left: 3px; opacity: 0.8; }
+  .modal-actual-miss { color: #c05050; opacity: 0.7; }
 
   /* modal pick pts */
   .modal-pick-pts { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
@@ -275,6 +285,48 @@
   .modal-pick-pts.pts-near  { background: rgba(232,168,48,0.12);  color: #e8a830; border: 1px solid rgba(232,168,48,0.25); }
   .modal-pick-pts.pts-far   { background: rgba(232,168,48,0.06);  color: #b88020; border: 1px solid rgba(232,168,48,0.15); }
   .modal-pick-pts.pts-miss  { background: rgba(224,90,90,0.08);   color: #c05050; border: 1px solid rgba(224,90,90,0.18); }
+
+  /* score badge wrap */
+  .pred-toggle-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
+  .score-badge-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .scoring-info-btn { background: none; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-mono); font-size: 10px; font-weight: 600; width: 16px; height: 16px; border-radius: 50%; cursor: pointer; padding: 0; line-height: 1; display: flex; align-items: center; justify-content: center; transition: color 0.12s, border-color 0.12s; flex-shrink: 0; }
+  .scoring-info-btn:hover { color: var(--green); border-color: var(--green); }
+
+  /* scoring explainer popover */
+  .scoring-popover-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .scoring-popover-overlay.open { display: flex; }
+  .scoring-popover { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  .scoring-popover-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 12px; border-bottom: 1px solid var(--border); }
+  .scoring-popover-title { font-family: var(--font-display); font-size: 18px; color: var(--text); }
+  .scoring-popover-close { background: none; border: none; color: var(--text3); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; transition: color 0.12s; }
+  .scoring-popover-close:hover { color: var(--text); }
+  .scoring-popover-body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .scoring-popover-total { font-family: var(--font-mono); font-size: 12px; color: var(--text3); background: var(--green-dim); border: 1px solid rgba(141,198,63,0.2); border-radius: 8px; padding: 7px 12px; }
+  .scoring-popover-total strong { color: var(--green2); }
+  .scoring-section-label { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-top: 2px; }
+  .scoring-table { display: flex; flex-direction: column; gap: 3px; }
+  .scoring-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; padding: 5px 10px; background: var(--surface); border-radius: 7px; }
+  .scoring-row-label { color: var(--text2); }
+  .scoring-row-val { font-family: var(--font-mono); font-size: 11px; color: var(--green2); white-space: nowrap; }
+  .scoring-note { font-size: 12px; color: var(--text3); line-height: 1.5; }
+  .scoring-note strong { color: var(--text2); }
+  .scoring-divider { height: 1px; background: var(--border); }
+  .scoring-proximity-grid { display: flex; flex-direction: column; gap: 4px; }
+  .prox-row { display: flex; align-items: center; gap: 8px; font-size: 11px; font-family: var(--font-mono); }
+  .prox-label { color: var(--text3); min-width: 80px; }
+  .prox-bar { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .prox-bar span { display: block; height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .prox-pct { min-width: 34px; text-align: right; }
+  .prox-exact .prox-bar span { background: #8dc63f; }
+  .prox-exact .prox-pct { color: #8dc63f; }
+  .prox-close .prox-bar span { background: #7ab870; }
+  .prox-close .prox-pct { color: #7ab870; }
+  .prox-near .prox-bar span { background: #e8a830; }
+  .prox-near .prox-pct { color: #e8a830; }
+  .prox-far .prox-bar span { background: #b88020; }
+  .prox-far .prox-pct { color: #b88020; }
+  .prox-miss .prox-bar span { background: #c05050; }
+  .prox-miss .prox-pct { color: #c05050; }
 </style>
 </head>
 <body>
@@ -406,6 +458,45 @@
   </div>
 </div>
 
+<!-- SCORING EXPLAINER POPOVER -->
+<div class="scoring-popover-overlay" id="scoring-popover-overlay" onclick="closeScoringExplainer()">
+  <div class="scoring-popover" onclick="event.stopPropagation()">
+    <div class="scoring-popover-header">
+      <span class="scoring-popover-title">How scoring works</span>
+      <button class="scoring-popover-close" onclick="closeScoringExplainer()">✕</button>
+    </div>
+    <div class="scoring-popover-body">
+      <div class="scoring-popover-total">Max <strong>140 pts</strong> total</div>
+
+      <div class="scoring-section-label">📍 Position picks</div>
+      <div class="scoring-table">
+        <div class="scoring-row"><span class="scoring-row-label">Top 3 slots (♂ &amp; ♀)</span><span class="scoring-row-val">10 pts max each</span></div>
+        <div class="scoring-row"><span class="scoring-row-label">Slots 4–6 (♂ &amp; ♀)</span><span class="scoring-row-val">5 pts max each</span></div>
+        <div class="scoring-row"><span class="scoring-row-label">Slots 7–10 (♂ &amp; ♀)</span><span class="scoring-row-val">3.75 pts max each</span></div>
+      </div>
+      <div class="scoring-note">Points scale down based on how far off your pick was:</div>
+      <div class="scoring-proximity-grid">
+        <div class="prox-row prox-exact"><span class="prox-label">Exact</span><span class="prox-bar"><span style="width:100%"></span></span><span class="prox-pct">100%</span></div>
+        <div class="prox-row prox-close"><span class="prox-label">Off by 1</span><span class="prox-bar"><span style="width:80%"></span></span><span class="prox-pct">80%</span></div>
+        <div class="prox-row prox-near"><span class="prox-label">Off by 2</span><span class="prox-bar"><span style="width:60%"></span></span><span class="prox-pct">60%</span></div>
+        <div class="prox-row prox-near"><span class="prox-label">Off by 3</span><span class="prox-bar"><span style="width:40%"></span></span><span class="prox-pct">40%</span></div>
+        <div class="prox-row prox-far"><span class="prox-label">Off by 4</span><span class="prox-bar"><span style="width:20%"></span></span><span class="prox-pct">20%</span></div>
+        <div class="prox-row prox-far"><span class="prox-label">Off by 5+</span><span class="prox-bar"><span style="width:10%"></span></span><span class="prox-pct">10%</span></div>
+        <div class="prox-row prox-miss"><span class="prox-label">Not in top 10</span><span class="prox-bar"><span style="width:0%"></span></span><span class="prox-pct">0%</span></div>
+      </div>
+
+      <div class="scoring-divider"></div>
+
+      <div class="scoring-section-label">⏱ Winner time</div>
+      <div class="scoring-table">
+        <div class="scoring-row"><span class="scoring-row-label">Men's winner time</span><span class="scoring-row-val">10 pts max</span></div>
+        <div class="scoring-row"><span class="scoring-row-label">Women's winner time</span><span class="scoring-row-val">10 pts max</span></div>
+      </div>
+      <div class="scoring-note">Linear decay — full points for exact, <strong>0 pts</strong> if off by 60+ minutes.</div>
+    </div>
+  </div>
+</div>
+
 <script>
 const MEN_ATHLETES = [
   { id: 'm0',  bib: 0,  name: 'Боян Иванджиков',      country: '🇧🇬' },
@@ -458,7 +549,14 @@ const WOMEN_ATHLETES = [
   { id: 'w4', bib: 4, name: 'Полина Горасова',   country: '🇧🇬' },
   { id: 'w5', bib: 5, name: 'Антония Георгиева', country: '🇧🇬' },
   { id: 'w6', bib: 6, name: 'Нели Петкова',      country: '🇧🇬' },
-  { id: 'w7', bib: 7, name: 'Елеонора Григорова',country: '🇧🇬' },
+  { id: 'w7',  bib: 7,  name: 'Елеонора Григорова', country: '🇧🇬' },
+  { id: 'w8',  bib: 8,  name: 'Боряна Николчева',   country: '🇧🇬' },
+  { id: 'w9',  bib: 9,  name: 'Вяра Кръстева',      country: '🇧🇬' },
+  { id: 'w10', bib: 10, name: 'Мирела Георгиева',   country: '🇧🇬' },
+  { id: 'w11', bib: 11, name: 'Тоня Тонева',        country: '🇧🇬' },
+  { id: 'w12', bib: 12, name: 'Златка Вълчева',     country: '🇧🇬' },
+  { id: 'w13', bib: 13, name: 'Анна Ванчева',       country: '🇧🇬' },
+  { id: 'w14', bib: 14, name: 'Лина Христова',      country: '🇧🇬' },
 ];
 
 function findA(arr, id) { return arr.find(a => a.id === id) || null; }
@@ -493,7 +591,7 @@ function loadFromStorage() {
 
 const HARDCODED_PREDICTION = {
   _hardcoded: true,
-  author: { name: 'Явор Г.', initials: 'ЯГ', location: 'София', at: 'преди старта', bg: '#2a3f1a', fg: '#8dc63f' },
+  author: { name: 'Ицо Пак Тича', initials: 'ИПТ', location: '21 Jun · 20:15', at: '21 Jun · 20:15', bg: '#2a3f1a', fg: '#8dc63f' },
   men: {
     time: '7:05:00',
     picks: [
@@ -679,7 +777,7 @@ function closeDropdown() {
 }
 
 document.addEventListener('click', e => { if (!document.getElementById('dropdown-portal').contains(e.target)) closeDropdown(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); closeModal(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); closeModal(); closeScoringExplainer(); } });
 window.addEventListener('scroll', () => {
   if (!activeDropdown) return;
   // Reposition dropdown instead of closing it
@@ -882,33 +980,61 @@ function renderPredictionCards() {
     const score = scorePrediction(p);
     const rank  = _rankMap.get(p) ?? 99;
 
-    function picksBlock(picks, time, gClass, label, resultFinishers) {
+    function picksBlock(picks, time, gClass, label, resultFinishers, timePts, winnerTime) {
       const actualPos = new Map(); resultFinishers.forEach((a, i) => actualPos.set(a.id, i));
-      const rows = picks.map((a, i) => {
-        if (!a) return '';
-        const slotMax = i < 3 ? W_TOP3 : W_LOW;
-        let tier = 'miss', dist = null, earned = 0, tooltipText = 'not in top 10 — 0 pts';
+      const rows = [];
+      for (let i = 0; i < 10; i++) {
+        const a = picks[i] || null;
+        if (!a) {
+          rows.push(`<div class="pick-row pick-row-empty">
+            <span class="pick-pos">${posLabel(i)}</span>
+            <span class="pick-medal">${medal(i)}</span>
+            <span class="pick-name pick-name-empty">—</span>
+            <span class="pick-pts pts-miss">0</span>
+          </div>`);
+          continue;
+        }
+        const slotMax = slotWeight(i);
+        let tier = 'miss', dist = null, earned = 0, tooltipText = 'not in top 10';
+        let actualResultLabel = '';
         if (actualPos.has(a.id)) {
           const ap = actualPos.get(a.id);
           dist = Math.abs(ap - i);
           const frac = proximityFraction(dist);
           earned = slotMax * frac;
           tier = pickTier(dist, true);
-          const label2 = pickTierLabel(dist, true);
-          tooltipText = `${label2} · ${earned.toFixed(1)} / ${slotMax.toFixed(1)} pts (${Math.round(frac*100)}%)`;
+          tooltipText = pickTierLabel(dist, true);
+          actualResultLabel = `<span class="pick-actual-pos">(${posLabel(ap)})</span>`;
+        } else {
+          actualResultLabel = `<span class="pick-actual-pos pick-actual-miss">(not top 10)</span>`;
         }
         const ptsLabel = earned > 0 ? `+${earned.toFixed(1)}` : '0';
         const ptsChip = `<span class="pick-pts pts-${tier}">${ptsLabel}</span>
           <span class="pick-pts-tooltip">${tooltipText}</span>`;
-        return `<div class="pick-row">
+        rows.push(`<div class="pick-row">
           <span class="pick-pos">${posLabel(i)}</span>
           <span class="pick-medal">${medal(i)}</span>
-          <span class="pick-name${i < 3 ? ' top' : ''}">${a.name} ${a.country}</span>
+          <span class="pick-name${i < 3 ? ' top' : ''}">${a.name}${actualResultLabel}</span>
           ${ptsChip}
-        </div>`;
-      }).filter(Boolean).join('');
-      const timeHtml = time ? `<div class="pick-time-lbl">predicted time</div><div class="pick-time">${time}</div>` : '<div class="pick-no-time">No time prediction</div>';
-      return `<div class="pred-detail-col"><h4 class="${gClass}">${label}</h4>${timeHtml}<div class="pick-list">${rows}</div></div>`;
+        </div>`);
+      }
+      const timePtsRounded = Math.round(timePts * 10) / 10;
+      const timePtsTier = timePtsRounded >= W_TIME * 0.8 ? 'exact' : timePtsRounded >= W_TIME * 0.5 ? 'close' : timePtsRounded >= W_TIME * 0.2 ? 'near' : timePtsRounded > 0 ? 'far' : 'miss';
+      const timePtsLabel = timePtsRounded > 0 ? `+${timePtsRounded.toFixed(1)}` : '0';
+      let timeTooltip = 'no time predicted';
+      if (time && winnerTime) {
+        const diffMins = timeToMins(time) - timeToMins(winnerTime);
+        const absDiff = Math.abs(diffMins);
+        const sign = diffMins > 0 ? '+' : '−';
+        const diffM = Math.floor(absDiff);
+        const diffS = Math.round((absDiff - diffM) * 60);
+        const diffStr = diffS > 0 ? `${sign}${diffM}m ${diffS}s` : `${sign}${diffM}m`;
+        timeTooltip = `${diffStr} vs actual · ${timePtsRounded.toFixed(1)} / ${W_TIME.toFixed(1)} pts`;
+      }
+      const timeHtml = time
+        ? `<div class="pick-time-row"><span class="pick-time-lbl">predicted time</span><span class="pick-time">${time}</span>${winnerTime ? `<span class="pick-actual-time">(${winnerTime})</span>` : ''}<span class="pick-pts pts-${timePtsTier} pick-pts-hoverable">${timePtsLabel}<span class="pick-pts-tooltip pick-pts-tooltip-time">${timeTooltip}</span></span></div>`
+        : '<div class="pick-no-time">No time prediction</div>';
+      return `<div class="pred-detail-col"><h4 class="${gClass}">${label}</h4>${timeHtml}<div class="pick-list">${rows.join('')}</div></div>`;
     }
 
     const card = document.createElement('div');
@@ -925,12 +1051,15 @@ function renderPredictionCards() {
           <div class="pred-quick-item"><span class="pred-quick-label">♀ 1st</span><span class="pred-quick-val">${wp[0] ? wp[0].name.split(' ')[0] : '—'}</span></div>
           ${scoreBadgeHtml(score, rank)}
         </div>
-        <span class="pred-chevron">▶</span>
+        <div class="pred-toggle-wrap">
+          <button class="scoring-info-btn" onclick="openScoringExplainer(event)" title="How scoring works">?</button>
+          <span class="pred-chevron">▶</span>
+        </div>
       </div>
       <div class="pred-card-body">
         <div class="pred-detail-cols">
-          ${picksBlock(mp, p.men.time, 'men-h', '♂ Men\'s picks', RACE_RESULTS.men.finishers)}
-          ${picksBlock(wp, p.women.time, 'women-h', '♀ Women\'s picks', RACE_RESULTS.women.finishers)}
+          ${picksBlock(mp, p.men.time, 'men-h', '♂ Men\'s picks', RACE_RESULTS.men.finishers, score.menTime, RACE_RESULTS.men.winnerTime)}
+          ${picksBlock(wp, p.women.time, 'women-h', '♀ Women\'s picks', RACE_RESULTS.women.finishers, score.womenTime, RACE_RESULTS.women.winnerTime)}
         </div>
         <button class="btn-full-detail" data-modal="${idx}">view full prediction ↗</button>
         <div style="clear:both"></div>
@@ -957,37 +1086,66 @@ function openModal(idx) {
     </div>
     <button class="modal-close" onclick="closeModal()">✕</button>`;
 
-  function colHtml(picks, time, gClass, label, resultFinishers) {
+  function colHtml(picks, time, gClass, label, resultFinishers, timePts, winnerTime) {
     const actualPos = new Map(); resultFinishers.forEach((a, i) => actualPos.set(a.id, i));
-    const rows = picks.map((a, i) => {
-      if (!a) return '';
-      const slotMax = i < 3 ? W_TOP3 : W_LOW;
+    const rows = [];
+    for (let i = 0; i < 10; i++) {
+      const a = picks[i] || null;
+      if (!a) {
+        rows.push(`<div class="modal-pick-row modal-pick-row-empty">
+          <span class="modal-pick-pos">${posLabel(i)}</span>
+          <span class="modal-pick-medal">${medal(i)}</span>
+          <span class="modal-pick-name" style="color:var(--text3);font-style:italic">—</span>
+          <span class="modal-pick-country"></span>
+          <span class="modal-pick-pts pts-miss">0</span>
+        </div>`);
+        continue;
+      }
+      const slotMax = slotWeight(i);
       let tier = 'miss', earned = 0, dist = null;
+      let actualResultLabel = '';
       if (actualPos.has(a.id)) {
         const ap = actualPos.get(a.id);
         dist = Math.abs(ap - i);
         earned = slotMax * proximityFraction(dist);
         tier = pickTier(dist, true);
+        actualResultLabel = `<span class="modal-actual-pos">(${posLabel(ap)})</span>`;
+      } else {
+        actualResultLabel = `<span class="modal-actual-pos modal-actual-miss">(not top 10)</span>`;
       }
       const ptsLabel = earned > 0 ? `+${earned.toFixed(1)}` : '0';
-      return `<div class="modal-pick-row">
+      rows.push(`<div class="modal-pick-row">
         <span class="modal-pick-pos">${posLabel(i)}</span>
         <span class="modal-pick-medal">${medal(i)}</span>
         <span class="modal-pick-name${i < 3 ? ' top' : ''}">${a.name}</span>
-        <span class="modal-pick-country">${a.country}</span>
-        <span class="modal-pick-pts pts-${tier}" title="${pickTierLabel(dist, dist !== null)} · ${earned.toFixed(1)}/${slotMax.toFixed(1)}">${ptsLabel}</span>
-      </div>`;
-    }).filter(Boolean).join('');
+        <span class="modal-pick-country">${actualResultLabel}</span>
+        <span class="modal-pick-pts pts-${tier}" title="${pickTierLabel(dist, dist !== null)}">${ptsLabel}</span>
+      </div>`);
+    }
+    const timePtsRounded = Math.round(timePts * 10) / 10;
+    const timePtsTier = timePtsRounded >= W_TIME * 0.8 ? 'exact' : timePtsRounded >= W_TIME * 0.5 ? 'close' : timePtsRounded >= W_TIME * 0.2 ? 'near' : timePtsRounded > 0 ? 'far' : 'miss';
+    const timePtsLabel = timePtsRounded > 0 ? `+${timePtsRounded.toFixed(1)}` : '0';
+    let timeTooltip = 'no time predicted';
+    if (time && winnerTime) {
+      const diffMins = timeToMins(time) - timeToMins(winnerTime);
+      const absDiff = Math.abs(diffMins);
+      const sign = diffMins > 0 ? '+' : '−';
+      const diffM = Math.floor(absDiff);
+      const diffS = Math.round((absDiff - diffM) * 60);
+      const diffStr = diffS > 0 ? `${sign}${diffM}m ${diffS}s` : `${sign}${diffM}m`;
+      timeTooltip = `${diffStr} vs actual · ${timePtsRounded.toFixed(1)} / ${W_TIME.toFixed(1)} pts`;
+    }
     const timeHtml = time
-      ? `<div class="modal-time-box"><span class="modal-time-val">${time}</span><span class="modal-time-label">predicted finish</span></div>`
+      ? `<div class="modal-time-box"><span class="modal-time-label">predicted finish</span><span class="modal-time-val">${time}</span>${winnerTime ? `<span class="pick-actual-time">(${winnerTime})</span>` : ''}<span class="modal-pick-pts pts-${timePtsTier} pick-pts-hoverable" style="margin-left:auto">${timePtsLabel}<span class="pick-pts-tooltip pick-pts-tooltip-time">${timeTooltip}</span></span></div>`
       : `<div class="modal-no-time">No time prediction submitted</div>`;
-    return `<div class="modal-col"><h4 class="${gClass}">${label}</h4>${timeHtml}<div class="modal-pick-rows">${rows}</div></div>`;
+    return `<div class="modal-col"><h4 class="${gClass}">${label}</h4>${timeHtml}<div class="modal-pick-rows">${rows.join('')}</div></div>`;
   }
 
+  const modalScore = scorePrediction(p);
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-cols">
-      ${colHtml(p.men.picks, p.men.time, 'men-h', '♂ Men\'s top 10', RACE_RESULTS.men.finishers)}
-      ${colHtml(p.women.picks, p.women.time, 'women-h', '♀ Women\'s top 10', RACE_RESULTS.women.finishers)}
+      ${colHtml(p.men.picks, p.men.time, 'men-h', '♂ Men\'s top 10', RACE_RESULTS.men.finishers, modalScore.menTime, RACE_RESULTS.men.winnerTime)}
+      ${colHtml(p.women.picks, p.women.time, 'women-h', '♀ Women\'s top 10', RACE_RESULTS.women.finishers, modalScore.womenTime, RACE_RESULTS.women.winnerTime)}
     </div>`;
 
   document.getElementById('modal-overlay').classList.add('open');
@@ -995,6 +1153,15 @@ function openModal(idx) {
 
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
 function handleOverlayClick(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+// ── SCORING EXPLAINER ─────────────────────────────────────────────────────────
+function openScoringExplainer(e) {
+  e.stopPropagation();
+  document.getElementById('scoring-popover-overlay').classList.add('open');
+}
+function closeScoringExplainer() {
+  document.getElementById('scoring-popover-overlay').classList.remove('open');
+}
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
 function showToast(msg) {
@@ -1018,30 +1185,33 @@ function showErrorToast(msg) {
 const RACE_RESULTS = {
   men: {
     finishers: [
-      { id: 'm1',  name: 'Христо Цветков',      country: '🇧🇬' },
-      { id: 'm4',  name: 'Александър Спасов',   country: '🇧🇬' },
-      { id: 'm24', name: 'Julien Feutrie',       country: '🇫🇷' },
-      { id: 'm0',  name: 'Боян Иванджиков',      country: '🇧🇬' },
-      { id: 'm8',  name: 'Даниел Кубашлиев',    country: '🇧🇬' },
-      { id: 'm15', name: 'Андрей Гридин',        country: '🇧🇬' },
-      { id: 'm3',  name: 'Пламен Пенов',         country: '🇧🇬' },
-      { id: 'm20', name: 'Росен Русев',          country: '🇧🇬' },
-      { id: 'm11', name: 'Стилян Аврамов',       country: '🇧🇬' },
-      { id: 'm6',  name: 'Николай Стойчев',      country: '🇧🇬' },
+      {id: 'm1',  name: 'Христо Цветков',     country: '🇧🇬' },
+      {id: 'm2',  name: 'Димитър Шадура',     country: '🇧🇬' },
+      {id: 'm6',  name: 'Николай Стойчев',    country: '🇧🇬' },
+      {id: 'm9',  name: 'Антон Кадиев',       country: '🇧🇬' },
+      {id: 'm10', name: 'Атанас Парашкевов',  country: '🇧🇬' },
+      {id: 'm12', name: 'Христо Минков',      country: '🇧🇬' },
+      {id: 'm14', name: 'Андриан Кърпаров',   country: '🇧🇬' },
+      {id: 'm17', name: 'Никола Кондарев',    country: '🇧🇬' },
+      {id: 'm19', name: 'Георги Добрев',      country: '🇧🇬' },
+      {id: 'm23', name: 'Иво Андреев',        country: '🇧🇬' },
     ],
-    winnerTime: '12:34:18'
+    winnerTime: '6:56:40'
   },
   women: {
     finishers: [
-      { id: 'w3', name: 'Надежда Ангелова',  country: '🇧🇬' },
-      { id: 'w1', name: 'Мария Николова',    country: '🇧🇬' },
-      { id: 'w5', name: 'Антония Георгиева', country: '🇧🇬' },
-      { id: 'w6', name: 'Нели Петкова',      country: '🇧🇬' },
-      { id: 'w2', name: 'Моника Филипова',   country: '🇧🇬' },
-      { id: 'w7', name: 'Елеонора Григорова',country: '🇧🇬' },
-      { id: 'w4', name: 'Полина Горасова',   country: '🇧🇬' },
+      {id: 'w2',  name: 'Моника Филипова',   country: '🇧🇬' },
+      {id: 'w4',  name: 'Полина Горасова',   country: '🇧🇬' },
+      {id: 'w6',  name: 'Нели Петкова',      country: '🇧🇬' },
+      {id: 'w8',  name: 'Боряна Николчева',  country: '🇧🇬' },
+      {id: 'w9',  name: 'Вяра Кръстева',     country: '🇧🇬' },
+      {id: 'w10', name: 'Мирела Георгиева',  country: '🇧🇬' },
+      {id: 'w11', name: 'Тоня Тонева',       country: '🇧🇬' },
+      {id: 'w12', name: 'Златка Вълчева',    country: '🇧🇬' },
+      {id: 'w13', name: 'Анна Ванчева',      country: '🇧🇬' },
+      {id: 'w14', name: 'Лина Христова',     country: '🇧🇬' },
     ],
-    winnerTime: '14:52:04'
+    winnerTime: '9:13:21'
   }
 };
 
@@ -1051,23 +1221,32 @@ const RACE_RESULTS = {
 //   Women winner time    : 10 pts
 //   Men  top-3 picks     : 10 pts max each  (proximity decay by distance)
 //   Women top-3 picks    : 10 pts max each
-//   Men  positions 4-10  : ~4.3 pts max each (group total = 30, same as top-3)
-//   Women positions 4-10 : ~4.3 pts max each
+//   Men  positions 4-6   : 5 pts max each
+//   Women positions 4-6  : 5 pts max each
+//   Men  positions 7-10  : 3.75 pts max each
+//   Women positions 7-10 : 3.75 pts max each
 //
 // Proximity scale (fraction of slot max, based on |predicted - actual| distance):
 //   dist 0  → 1.00  (exact)
-//   dist 1  → 0.75  (one off)
-//   dist 2  → 0.55  (two off)
-//   dist 3  → 0.35  (three off)
-//   dist 4  → 0.18  (four off)
-//   dist 5+ → 0.07  (still in top-10 but way off)
+//   dist 1  → 0.80  (one off)
+//   dist 2  → 0.60  (two off)
+//   dist 3  → 0.40  (three off)
+//   dist 4  → 0.20  (four off)
+//   dist 5+ → 0.10  (still in top-10 but way off)
 //   not in top-10 → 0
 const W_TOP3  = 10;
-const W_LOW   = 30 / 7;
+const W_MID   = 5;
+const W_LOW   = 3.75;
 const W_TIME  = 10;
 const MAX_TIME_DIFF_MINS = 60;
 
-const PROXIMITY_SCALE = [1.00, 0.75, 0.55, 0.35, 0.18, 0.07];
+const PROXIMITY_SCALE = [1.00, 0.80, 0.60, 0.40, 0.20, 0.10];
+
+function slotWeight(pos) {
+  if (pos < 3) return W_TOP3;
+  if (pos < 6) return W_MID;
+  return W_LOW;
+}
 
 function proximityFraction(dist) {
   if (dist < 0) return 0;
@@ -1110,7 +1289,7 @@ function scorePicks(picks, resultFinishers) {
   const detail = [];
   picks.forEach((pick, predPos) => {
     if (!pick) return;
-    const slotMax = predPos < 3 ? W_TOP3 : W_LOW;
+    const slotMax = slotWeight(predPos);
     if (!actualPos.has(pick.id)) {
       detail.push({ predPos, pick, status: 'miss', tier: 'miss', dist: null, pts: 0, slotMax });
       return;
@@ -1148,7 +1327,7 @@ function renderResultsBanner() {
       <div class="result-row">
         <span class="result-pos">${posLabel(i)}</span>
         <span>${medal(i)}</span>
-        <span class="result-name${i < 3 ? ' top' : ''}">${a.name} ${a.country}</span>
+        <span class="result-name${i < 3 ? ' top' : ''}">${a.name}</span>
       </div>`).join('');
     return `<div class="results-col">
       <h4 class="${gClass}">${label}</h4>
