@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Race Predictions</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0c0f0a; --bg2: #141810; --bg3: #1a2016;
+    --surface: #1f271a; --surface2: #273120;
+    --border: rgba(160,200,100,0.12); --border2: rgba(160,200,100,0.22);
+    --green: #8dc63f; --green2: #b8e06a; --green-dim: rgba(141,198,63,0.15);
+    --amber: #e8a830;
+    --text: #e8edd8; --text2: #9aaa80; --text3: #5a6a48;
+    --radius: 10px;
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'Figtree', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+  .back-btn { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 12px; color: var(--text3); text-decoration: none; letter-spacing: 0.06em; padding: 5px 13px; border: 1px solid var(--border); border-radius: 100px; transition: color 0.15s, border-color 0.15s; position: absolute; top: 24px; left: 24px; }
+  .back-btn:hover { color: var(--green); border-color: rgba(141,198,63,0.3); }
+ overflow: hidden; padding: 60px 24px 48px; text-align: center; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #111a0d 0%, var(--bg) 100%); }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(141,198,63,0.08) 0%, transparent 70%); pointer-events: none; }
+  .race-label { display: inline-block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--green); background: var(--green-dim); border: 1px solid rgba(141,198,63,0.3); padding: 4px 14px; border-radius: 100px; margin-bottom: 20px; }
+  .hero h1 { font-family: var(--font-display); font-size: clamp(52px, 8vw, 88px); line-height: 0.95; letter-spacing: -0.02em; color: var(--text); margin-bottom: 10px; }
+  .hero h1 em { color: var(--green); font-style: italic; }
+  .hero-sub { font-size: 15px; color: var(--text2); margin-bottom: 32px; font-weight: 300; letter-spacing: 0.04em; }
+  .race-meta { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+  .meta-item { text-align: center; }
+  .meta-label { font-size: 11px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .meta-value { font-size: 16px; font-weight: 600; color: var(--text); }
+  .meta-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .section-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .icon-men { background: rgba(55,138,221,0.15); }
+  .icon-women { background: rgba(212,83,126,0.15); }
+  .section-title { font-family: var(--font-display); font-size: 28px; }
+  .section-title.men { color: #7ab8f5; }
+  .section-title.women { color: #e896b8; }
+  .section-badge { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--text3); background: var(--surface); border: 1px solid var(--border); padding: 3px 10px; border-radius: 100px; }
+
+  .gender-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 48px; }
+  @media (max-width: 720px) { .gender-sections { grid-template-columns: 1fr; } }
+  .gender-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .panel-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border); }
+  .panel-header.men { background: linear-gradient(135deg, rgba(55,138,221,0.06) 0%, transparent 60%); }
+  .panel-header.women { background: linear-gradient(135deg, rgba(212,83,126,0.06) 0%, transparent 60%); }
+  .panel-body { padding: 20px 22px; }
+
+  .winner-time-block { margin-bottom: 20px; }
+  .field-label { font-size: 12px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .time-inputs { display: flex; align-items: center; gap: 6px; }
+  .time-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono); font-size: 18px; text-align: center; padding: 8px 6px; border-radius: 8px; width: 52px; outline: none; transition: border-color 0.15s; }
+  .time-input:focus { border-color: var(--green); }
+  .time-input.required-error { border-color: #e05a5a; animation: shake 0.3s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+  .position-row.required-pick { border-color: rgba(160,200,100,0.35); }
+  .position-row.required-pick .pos-badge { box-shadow: 0 0 0 1px rgba(232,168,48,0.4); }
+  .position-row.required-error { border-color: #e05a5a; animation: shake 0.3s ease; }
+  .required-hint { font-size: 10px; font-family: var(--font-mono); color: var(--text3); margin-top: 4px; letter-spacing: 0.06em; }
+  .required-hint span { color: #e8a830; }
+  .time-sep { color: var(--text3); font-family: var(--font-mono); font-size: 18px; }
+  .time-unit { font-size: 11px; font-family: var(--font-mono); color: var(--text3); margin-top: 4px; text-align: center; }
+
+  .positions-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .positions-label { font-size: 12px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; }
+  .show-more-btn { background: none; border: none; color: var(--green); font-size: 12px; font-family: var(--font-mono); cursor: pointer; padding: 0; }
+  .show-more-btn:hover { color: var(--green2); }
+  .positions-grid { display: flex; flex-direction: column; gap: 8px; }
+  .positions-collapsed .position-row:nth-child(n+4) { display: none; }
+  .position-row { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; transition: border-color 0.15s; }
+  .position-row:hover { border-color: var(--border2); }
+  .pos-badge { font-family: var(--font-mono); font-size: 12px; font-weight: 500; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pos-1 { background: rgba(232,168,48,0.18); color: #e8a830; }
+  .pos-2 { background: rgba(180,180,200,0.15); color: #b0b8cc; }
+  .pos-3 { background: rgba(180,110,60,0.15); color: #c87a48; }
+  .pos-other { background: var(--surface2); color: var(--text3); }
+
+  .select-wrapper { flex: 1; overflow: hidden; }
+  .athlete-select-trigger { width: 100%; background: transparent; border: none; color: var(--text); font-family: var(--font-body); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 6px; outline: none; padding: 0; }
+  .trigger-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; color: var(--text2); }
+  .trigger-name.selected { color: var(--text); }
+  .trigger-arrow { font-size: 10px; color: var(--text3); flex-shrink: 0; transition: transform 0.2s; }
+  .trigger-arrow.open { transform: rotate(180deg); }
+
+  .dropdown-panel { position: fixed; z-index: 9999; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); overflow: hidden; display: none; box-shadow: 0 16px 40px rgba(0,0,0,0.55); }
+  .dropdown-panel.open { display: block; }
+  .dropdown-search { padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .dropdown-search input { flex: 1; background: transparent; border: none; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; }
+  .dropdown-search input::placeholder { color: var(--text3); }
+  .search-icon { color: var(--text3); font-size: 15px; }
+  .dropdown-list { max-height: 240px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+  .dropdown-option { display: flex; align-items: center; gap: 8px; padding: 9px 14px; cursor: pointer; font-size: 13px; transition: background 0.1s; }
+  .dropdown-option:hover { background: var(--surface2); }
+  .dropdown-option.selected { background: var(--green-dim); }
+  .dropdown-option.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+  .opt-star { font-size: 12px; color: var(--amber); flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; }
+  .opt-star-count { font-family: var(--font-mono); font-size: 10px; color: var(--amber); opacity: 0.85; }
+  .opt-star-empty { font-size: 12px; color: var(--text3); opacity: 0.3; flex-shrink: 0; }
+  .opt-number { font-family: var(--font-mono); font-size: 11px; color: var(--text3); min-width: 28px; }
+  .opt-country { margin-left: auto; font-size: 13px; }
+  .dropdown-section-label { font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); padding: 8px 14px 4px; border-top: 1px solid var(--border); }
+  .dropdown-section-label:first-child { border-top: none; }
+  .no-results { padding: 14px; text-align: center; color: var(--text3); font-size: 13px; }
+
+  .submit-area { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .submit-info h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 4px; }
+  .submit-info p { font-size: 14px; color: var(--text2); }
+  .submit-right { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+  .name-input-wrap { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .name-input-label { font-size: 11px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; text-align: center; }
+  .name-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; border-radius: 100px; outline: none; width: 180px; transition: border-color 0.15s; }
+  .name-input::placeholder { color: var(--text3); }
+  .name-input:focus { border-color: var(--green); }
+  .name-input.required-error { border-color: #e05a5a; animation: shake 0.3s ease; }
+  .btn-submit { background: var(--green); color: #0c1a06; font-family: var(--font-body); font-weight: 600; font-size: 15px; border: none; padding: 13px 32px; border-radius: 100px; cursor: pointer; transition: background 0.15s, transform 0.1s; white-space: nowrap; }
+  .btn-submit:hover { background: var(--green2); transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); }
+
+  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1px solid var(--green); color: var(--green2); font-size: 14px; font-family: var(--font-mono); padding: 12px 24px; border-radius: 100px; z-index: 10000; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s; opacity: 0; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.error { border-color: #e05a5a; color: #f08080; }
+
+  .predictions-section { margin-top: 48px; }
+  .predictions-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+  .predictions-title { font-family: var(--font-display); font-size: 26px; }
+  .predictions-count { font-family: var(--font-mono); font-size: 13px; color: var(--text3); }
+
+  .pred-cards { display: flex; flex-direction: column; gap: 10px; }
+
+  .pred-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .pred-card-header { display: flex; align-items: center; gap: 14px; padding: 14px 18px; cursor: pointer; transition: background 0.12s; user-select: none; }
+  .pred-card-header:hover { background: var(--surface2); }
+  .pred-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 15px; flex-shrink: 0; }
+  .pred-author-info { flex: 1; min-width: 0; }
+  .pred-author-name { font-weight: 600; font-size: 14px; }
+  .pred-author-meta { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
+  .pred-quick { display: flex; gap: 20px; flex-wrap: wrap; flex-shrink: 0; }
+  .pred-quick-item { text-align: right; }
+  .pred-quick-label { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; display: block; }
+  .pred-quick-val { font-size: 13px; color: var(--text2); white-space: nowrap; }
+  .pred-chevron { color: var(--text3); font-size: 11px; transition: transform 0.2s; flex-shrink: 0; }
+  .pred-card.open .pred-chevron { transform: rotate(90deg); }
+
+  .pred-card-body { display: none; border-top: 1px solid var(--border); padding: 18px 20px 20px; }
+  .pred-card.open .pred-card-body { display: block; }
+
+  .pred-detail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 540px) { .pred-detail-cols { grid-template-columns: 1fr; } }
+  .pred-detail-col h4 { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .pred-detail-col h4.men-h { color: #7ab8f5; }
+  .pred-detail-col h4.women-h { color: #e896b8; }
+  .pick-list { display: flex; flex-direction: column; gap: 5px; }
+  .pick-row { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+  .pick-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); min-width: 22px; }
+  .pick-medal { font-size: 13px; min-width: 18px; }
+  .pick-name { color: var(--text2); }
+  .pick-name.top { color: var(--text); font-weight: 500; }
+  .pick-time { margin-top: 10px; font-family: var(--font-mono); font-size: 15px; color: var(--green); }
+  .pick-no-time { margin-top: 8px; font-size: 12px; color: var(--text3); font-style: italic; }
+  .pick-time-row { display: flex; align-items: baseline; gap: 12px; margin-top: 6px; margin-bottom: 14px; }
+  .pick-time-lbl { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+
+  .btn-full-detail { background: none; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; padding: 5px 14px; border-radius: 100px; cursor: pointer; transition: color 0.12s, border-color 0.12s; margin-top: 14px; float: right; }
+  .btn-full-detail:hover { color: var(--text); border-color: var(--green); }
+
+  .divider { height: 1px; background: var(--border); margin: 40px 0; }
+  .empty-state { text-align: center; padding: 48px; color: var(--text3); font-size: 15px; }
+  .empty-icon { font-size: 36px; margin-bottom: 12px; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 9998; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; width: 100%; max-width: 900px; max-height: 88vh; overflow-y: auto; }
+  .modal-header { display: flex; align-items: center; gap: 14px; padding: 20px 24px 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg2); z-index: 1; }
+  .modal-avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 17px; flex-shrink: 0; }
+  .modal-author-name { font-weight: 600; font-size: 17px; }
+  .modal-author-sub { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
+  .modal-close { margin-left: auto; background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; line-height: 1; transition: color 0.12s; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 22px 24px 28px; }
+  .modal-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 520px) { .modal-cols { grid-template-columns: 1fr; } }
+  .modal-col h4 { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .modal-col h4.men-h { color: #7ab8f5; }
+  .modal-col h4.women-h { color: #e896b8; }
+  .modal-pick-rows { display: flex; flex-direction: column; gap: 5px; }
+  .modal-pick-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; background: var(--surface); border-radius: 8px; font-size: 13px; min-height: 36px; box-sizing: border-box; }
+  .modal-pick-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); min-width: 28px; }
+  .modal-pick-medal { font-size: 15px; min-width: 20px; }
+  .modal-pick-name { flex: 1; color: var(--text2); }
+  .modal-pick-name.top { color: var(--text); font-weight: 500; }
+  .modal-pick-country { font-size: 14px; }
+  .modal-time-box { display: flex; align-items: baseline; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; width: 100%; box-sizing: border-box; }
+  .modal-time-val { font-family: var(--font-mono); font-size: 13px; color: var(--green2); }
+  .modal-time-label { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+  .modal-no-time { margin-top: 10px; color: var(--text3); font-size: 13px; font-style: italic; }
+  .modal-divider { height: 1px; background: var(--border); margin: 20px 0; display: none; }
+  @media (max-width: 520px) { .modal-divider { display: block; } }
+
+  /* ── SCORING ── */
+  .results-banner { background: var(--surface); border: 1px solid rgba(141,198,63,0.25); border-radius: 14px; padding: 20px 24px; margin-bottom: 32px; }
+  .results-banner-header { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+  .results-banner-header:hover h3 { color: var(--green2); }
+  .results-chevron { margin-left: auto; font-size: 11px; color: var(--text3); transition: transform 0.25s; }
+  .results-banner.open .results-chevron { transform: rotate(90deg); }
+  .results-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease, margin-top 0.3s ease; margin-top: 0; }
+  .results-banner.open .results-body { max-height: 800px; margin-top: 16px; }
+  .results-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(141,198,63,0.12); border: 1px solid rgba(141,198,63,0.3); color: var(--green2); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .results-pill::before { content: '✓'; font-size: 10px; }
+  .results-banner h3 { font-family: var(--font-display); font-size: 20px; }
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
+  .results-col h4 { font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .results-col h4.men-h { color: #7ab8f5; }
+  .results-col h4.women-h { color: #e896b8; }
+  .result-row { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .result-row:last-child { border-bottom: none; }
+  .result-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); min-width: 26px; }
+  .result-name { flex: 1; color: var(--text2); }
+  .result-name.top { color: var(--text); font-weight: 500; }
+  .result-time-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .result-time-lbl { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; }
+  .result-time-val { font-family: var(--font-mono); font-size: 15px; color: var(--green); }
+
+  .score-badge { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 100px; border: 1px solid; flex-shrink: 0; }
+  .score-badge.gold   { background: rgba(232,168,48,0.12); color: #e8a830; border-color: rgba(232,168,48,0.3); }
+  .score-badge.silver { background: rgba(180,180,200,0.1); color: #b0b8cc; border-color: rgba(180,180,200,0.25); }
+  .score-badge.bronze { background: rgba(180,110,60,0.1);  color: #c87a48; border-color: rgba(180,110,60,0.25); }
+  .score-badge.plain  { background: var(--surface2); color: var(--text2); border-color: var(--border); }
+  .score-badge .score-pts { opacity: 0.6; font-size: 10px; }
+
+  .leaderboard { margin-top: 32px; margin-bottom: 16px; }
+  .leaderboard-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 14px; }
+  .lb-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .lb-row { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: var(--surface2); }
+  .lb-rank { font-family: var(--font-mono); font-size: 13px; min-width: 24px; color: var(--text3); }
+  .lb-rank.r1 { color: #e8a830; }
+  .lb-rank.r2 { color: #b0b8cc; }
+  .lb-rank.r3 { color: #c87a48; }
+  .lb-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; flex-shrink: 0; }
+  .lb-name { flex: 1; font-size: 14px; font-weight: 500; }
+  .lb-breakdown { font-size: 11px; font-family: var(--font-mono); color: var(--text3); }
+  .lb-score { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--green2); min-width: 52px; text-align: right; }
+
+  .score-breakdown { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+  .score-breakdown-title { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .score-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+  .score-cat { display: flex; align-items: center; gap: 5px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 11px; font-family: var(--font-mono); }
+  .score-cat-label { color: var(--text3); }
+  .score-cat-val { color: var(--text); font-weight: 500; }
+  .score-cat-max { color: var(--text3); font-size: 10px; }
+
+  .pick-row { position: relative; }
+  .pick-row-empty { opacity: 0.45; }
+  .pick-name-empty { color: var(--text3); font-style: italic; }
+  .pick-pts { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .pick-pts.pts-exact  { background: rgba(141,198,63,0.15); color: #8dc63f; border: 1px solid rgba(141,198,63,0.3); }
+  .pick-pts.pts-close  { background: rgba(141,198,63,0.08); color: #7ab870; border: 1px solid rgba(141,198,63,0.18); }
+  .pick-pts.pts-near   { background: rgba(232,168,48,0.12);  color: #e8a830; border: 1px solid rgba(232,168,48,0.25); }
+  .pick-pts.pts-far    { background: rgba(232,168,48,0.06);  color: #b88020; border: 1px solid rgba(232,168,48,0.15); }
+  .pick-pts.pts-miss   { background: rgba(224,90,90,0.08);   color: #c05050; border: 1px solid rgba(224,90,90,0.18); }
+  .pick-pts-tooltip    { position: absolute; bottom: calc(100% + 4px); right: 0; background: var(--bg2); border: 1px solid var(--border2); border-radius: 7px; padding: 5px 9px; font-size: 11px; font-family: var(--font-mono); color: var(--text2); white-space: nowrap; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.15s; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+  .pick-row:hover .pick-pts-tooltip { opacity: 1; }
+  .pick-pts-hoverable { position: relative; cursor: default; }
+  .pick-pts-tooltip-time { bottom: calc(100% + 4px); right: 0; }
+  .pick-pts-hoverable:hover .pick-pts-tooltip-time { opacity: 1; }
+  .pick-actual-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); margin-left: 4px; opacity: 0.8; }
+  .pick-actual-time { font-family: var(--font-mono); font-size: 10px; color: var(--text3); opacity: 0.75; }
+  .pick-actual-miss { color: #c05050; opacity: 0.7; }
+  .modal-actual-pos { font-family: var(--font-mono); font-size: 10px; color: var(--text3); margin-left: 3px; opacity: 0.8; }
+  .modal-actual-miss { color: #c05050; opacity: 0.7; }
+
+  /* modal pick pts */
+  .modal-pick-pts { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .modal-pick-pts.pts-exact { background: rgba(141,198,63,0.15); color: #8dc63f; border: 1px solid rgba(141,198,63,0.3); }
+  .modal-pick-pts.pts-close { background: rgba(141,198,63,0.08); color: #7ab870; border: 1px solid rgba(141,198,63,0.18); }
+  .modal-pick-pts.pts-near  { background: rgba(232,168,48,0.12);  color: #e8a830; border: 1px solid rgba(232,168,48,0.25); }
+  .modal-pick-pts.pts-far   { background: rgba(232,168,48,0.06);  color: #b88020; border: 1px solid rgba(232,168,48,0.15); }
+  .modal-pick-pts.pts-miss  { background: rgba(224,90,90,0.08);   color: #c05050; border: 1px solid rgba(224,90,90,0.18); }
+
+  /* score badge wrap */
+  .pred-toggle-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
+  .score-badge-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .scoring-info-btn { background: none; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-mono); font-size: 10px; font-weight: 600; width: 16px; height: 16px; border-radius: 50%; cursor: pointer; padding: 0; line-height: 1; display: flex; align-items: center; justify-content: center; transition: color 0.12s, border-color 0.12s; flex-shrink: 0; }
+  .scoring-info-btn:hover { color: var(--green); border-color: var(--green); }
+
+  /* scoring explainer popover */
+  .scoring-popover-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .scoring-popover-overlay.open { display: flex; }
+  .scoring-popover { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  .scoring-popover-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 12px; border-bottom: 1px solid var(--border); }
+  .scoring-popover-title { font-family: var(--font-display); font-size: 18px; color: var(--text); }
+  .scoring-popover-close { background: none; border: none; color: var(--text3); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; transition: color 0.12s; }
+  .scoring-popover-close:hover { color: var(--text); }
+  .scoring-popover-body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .scoring-popover-total { font-family: var(--font-mono); font-size: 12px; color: var(--text3); background: var(--green-dim); border: 1px solid rgba(141,198,63,0.2); border-radius: 8px; padding: 7px 12px; }
+  .scoring-popover-total strong { color: var(--green2); }
+  .scoring-section-label { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-top: 2px; }
+  .scoring-table { display: flex; flex-direction: column; gap: 3px; }
+  .scoring-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; padding: 5px 10px; background: var(--surface); border-radius: 7px; }
+  .scoring-row-label { color: var(--text2); }
+  .scoring-row-val { font-family: var(--font-mono); font-size: 11px; color: var(--green2); white-space: nowrap; }
+  .scoring-note { font-size: 12px; color: var(--text3); line-height: 1.5; }
+  .scoring-note strong { color: var(--text2); }
+  .scoring-divider { height: 1px; background: var(--border); }
+  .scoring-proximity-grid { display: flex; flex-direction: column; gap: 4px; }
+  .prox-row { display: flex; align-items: center; gap: 8px; font-size: 11px; font-family: var(--font-mono); }
+  .prox-label { color: var(--text3); min-width: 80px; }
+  .prox-bar { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .prox-bar span { display: block; height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .prox-pct { min-width: 34px; text-align: right; }
+  .prox-exact .prox-bar span { background: #8dc63f; }
+  .prox-exact .prox-pct { color: #8dc63f; }
+  .prox-close .prox-bar span { background: #7ab870; }
+  .prox-close .prox-pct { color: #7ab870; }
+  .prox-near .prox-bar span { background: #e8a830; }
+  .prox-near .prox-pct { color: #e8a830; }
+  .prox-far .prox-bar span { background: #b88020; }
+  .prox-far .prox-pct { color: #b88020; }
+  .prox-miss .prox-bar span { background: #c05050; }
+  .prox-miss .prox-pct { color: #c05050; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <a class="back-btn" href="index.html">← All races</a>
+  <div class="race-label" id="hero-label">Race Predictions</div>
+  <h1 id="hero-title">Loading…</h1>
+  <p class="hero-sub" id="hero-sub"></p>
+  <div class="race-meta" id="hero-meta"></div>
+</div>
+
+<div class="main">
+  <div class="gender-sections">
+    <!-- MEN -->
+    <div class="gender-panel" id="panel-men">
+      <div class="panel-header men">
+        <div class="section-header">
+          <div class="section-icon icon-men">♂</div>
+          <span class="section-title men">Men</span>
+          <span class="section-badge" id="men-picked-count">0 / 10 picked</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="winner-time-block">
+          <label class="field-label">Predicted winner time <span style="color:var(--amber)">✦ Required</span></label>
+          <div class="time-inputs">
+            <div><input class="time-input" type="text" id="men-h" maxlength="2" inputmode="numeric" placeholder="HH" autocomplete="off"><div class="time-unit">h</div></div>
+            <span class="time-sep">:</span>
+            <div><input class="time-input" type="text" id="men-m" maxlength="2" inputmode="numeric" placeholder="MM" autocomplete="off"><div class="time-unit">min</div></div>
+            <span class="time-sep">:</span>
+            <div><input class="time-input" type="text" id="men-s" maxlength="2" inputmode="numeric" placeholder="SS" autocomplete="off"><div class="time-unit">sec</div></div>
+          </div>
+        </div>
+        <div class="positions-header">
+          <span class="positions-label">Top 10 finishers <span style="color:var(--amber);font-size:10px;">✦ Top 3 required</span></span>
+          <button class="show-more-btn" onclick="togglePositions('men')">show up to 10</button>
+        </div>
+        <div class="positions-grid positions-collapsed" id="positions-men"></div>
+      </div>
+    </div>
+    <!-- WOMEN -->
+    <div class="gender-panel" id="panel-women">
+      <div class="panel-header women">
+        <div class="section-header">
+          <div class="section-icon icon-women">♀</div>
+          <span class="section-title women">Women</span>
+          <span class="section-badge" id="women-picked-count">0 / 10 picked</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="winner-time-block">
+          <label class="field-label">Predicted winner time <span style="color:var(--amber)">✦ Required</span></label>
+          <div class="time-inputs">
+            <div><input class="time-input" type="text" id="women-h" maxlength="2" inputmode="numeric" placeholder="HH" autocomplete="off"><div class="time-unit">h</div></div>
+            <span class="time-sep">:</span>
+            <div><input class="time-input" type="text" id="women-m" maxlength="2" inputmode="numeric" placeholder="MM" autocomplete="off"><div class="time-unit">min</div></div>
+            <span class="time-sep">:</span>
+            <div><input class="time-input" type="text" id="women-s" maxlength="2" inputmode="numeric" placeholder="SS" autocomplete="off"><div class="time-unit">sec</div></div>
+          </div>
+        </div>
+        <div class="positions-header">
+          <span class="positions-label">Top 10 finishers <span style="color:var(--amber);font-size:10px;">✦ Top 3 required</span></span>
+          <button class="show-more-btn" onclick="togglePositions('women')">show up to 10</button>
+        </div>
+        <div class="positions-grid positions-collapsed" id="positions-women"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <div class="submit-info">
+      <h3>Submit your prediction</h3>
+      <p id="submit-deadline">Predictions lock 1 hour before race start</p>
+    </div>
+    <div class="submit-right">
+      <div class="name-input-wrap">
+        <span class="name-input-label">Your name <span style="color:var(--amber)">✦ Required</span></span>
+        <input class="name-input" type="text" id="submitter-name" placeholder="e.g. Ivan Petrov" maxlength="40" autocomplete="name">
+      </div>
+      <button class="btn-submit" onclick="submitPrediction()">Submit Prediction →</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- RACE RESULTS BANNER -->
+  <div class="results-banner" id="results-banner">
+    <div class="results-banner-header" onclick="document.getElementById('results-banner').classList.toggle('open')">
+      <span class="results-pill">Official Results</span>
+      <h3 id="results-banner-title">Race · 2026</h3>
+      <span class="results-chevron">▶</span>
+    </div>
+    <div class="results-body">
+      <div class="results-grid" id="results-grid"></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="leaderboard">
+    <div class="leaderboard-title">🏆 Prediction Leaderboard</div>
+    <div class="lb-table" id="leaderboard-table"></div>
+  </div>
+
+  <div class="predictions-section">
+    <div class="predictions-header">
+      <span class="predictions-title">Community Predictions</span>
+      <span class="predictions-count" id="total-predictions-count">0 predictions</span>
+    </div>
+    <div id="predictions-container"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="dropdown-panel" id="dropdown-portal"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header" id="modal-header"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- SCORING EXPLAINER POPOVER -->
+<div class="scoring-popover-overlay" id="scoring-popover-overlay" onclick="closeScoringExplainer()">
+  <div class="scoring-popover" onclick="event.stopPropagation()">
+    <div class="scoring-popover-header">
+      <span class="scoring-popover-title">How scoring works</span>
+      <button class="scoring-popover-close" onclick="closeScoringExplainer()">✕</button>
+    </div>
+    <div class="scoring-popover-body">
+      <div class="scoring-popover-total">Max <strong>140 pts</strong> total</div>
+
+      <div class="scoring-section-label">📍 Position picks</div>
+      <div class="scoring-table">
+        <div class="scoring-row"><span class="scoring-row-label">Top 3 slots (♂ &amp; ♀)</span><span class="scoring-row-val">10 pts max each</span></div>
+        <div class="scoring-row"><span class="scoring-row-label">Slots 4–6 (♂ &amp; ♀)</span><span class="scoring-row-val">5 pts max each</span></div>
+        <div class="scoring-row"><span class="scoring-row-label">Slots 7–10 (♂ &amp; ♀)</span><span class="scoring-row-val">3.75 pts max each</span></div>
+      </div>
+      <div class="scoring-note">Points scale down based on how far off your pick was:</div>
+      <div class="scoring-proximity-grid">
+        <div class="prox-row prox-exact"><span class="prox-label">Exact</span><span class="prox-bar"><span style="width:100%"></span></span><span class="prox-pct">100%</span></div>
+        <div class="prox-row prox-close"><span class="prox-label">Off by 1</span><span class="prox-bar"><span style="width:80%"></span></span><span class="prox-pct">80%</span></div>
+        <div class="prox-row prox-near"><span class="prox-label">Off by 2</span><span class="prox-bar"><span style="width:60%"></span></span><span class="prox-pct">60%</span></div>
+        <div class="prox-row prox-near"><span class="prox-label">Off by 3</span><span class="prox-bar"><span style="width:40%"></span></span><span class="prox-pct">40%</span></div>
+        <div class="prox-row prox-far"><span class="prox-label">Off by 4</span><span class="prox-bar"><span style="width:20%"></span></span><span class="prox-pct">20%</span></div>
+        <div class="prox-row prox-far"><span class="prox-label">Off by 5+</span><span class="prox-bar"><span style="width:10%"></span></span><span class="prox-pct">10%</span></div>
+        <div class="prox-row prox-miss"><span class="prox-label">Not in top 10</span><span class="prox-bar"><span style="width:0%"></span></span><span class="prox-pct">0%</span></div>
+      </div>
+
+      <div class="scoring-divider"></div>
+
+      <div class="scoring-section-label">⏱ Winner time</div>
+      <div class="scoring-table">
+        <div class="scoring-row"><span class="scoring-row-label">Men's winner time</span><span class="scoring-row-val">10 pts max</span></div>
+        <div class="scoring-row"><span class="scoring-row-label">Women's winner time</span><span class="scoring-row-val">10 pts max</span></div>
+      </div>
+      <div class="scoring-note">Linear decay — full points for exact, <strong>0 pts</strong> if off by 60+ minutes.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── MULTI-RACE REGISTRY ───────────────────────────────────────────────────────
+// Each race entry contains all data needed to power the prediction page.
+// To add a new race: copy one entry, give it a unique id, fill in the fields.
+const RACES_REGISTRY = {
+  vitosha100: {
+    id: 'vitosha100',
+    name: 'Vitosha 100',
+    titleHtml: 'Vitosha <em>100</em>',
+    subtitle: 'Trail Ultramarathon · Sofia, Bulgaria · June 27–28, 2026',
+    label: 'Race Predictions',
+    meta: [
+      { label: 'Distance',   value: '99.2 km' },
+      { label: 'Elevation',  value: '1 875 m'  },
+      { label: 'Registered', value: '789 athletes' },
+      { label: 'Edition',    value: '43rd' },
+    ],
+    deadline: 'Predictions lock 1 hour before race start · June 14, 2025 at 05:00',
+    resultsTitle: 'Vitosha 100 · 2026',
+    menAthletes: [
+      { id: 'm0',  bib: 0,  name: 'Боян Иванджиков',      country: '🇧🇬' },
+      { id: 'm1',  bib: 1,  name: 'Христо Цветков',       country: '🇧🇬' },
+      { id: 'm2',  bib: 2,  name: 'Димитър Шадура',       country: '🇧🇬' },
+      { id: 'm3',  bib: 3,  name: 'Пламен Пенов',         country: '🇧🇬' },
+      { id: 'm4',  bib: 4,  name: 'Александър Спасов',    country: '🇧🇬' },
+      { id: 'm5',  bib: 5,  name: 'Ивайло Атанасов',      country: '🇧🇬' },
+      { id: 'm6',  bib: 6,  name: 'Николай Стойчев',      country: '🇧🇬' },
+      { id: 'm7',  bib: 7,  name: 'Александър Христов',   country: '🇧🇬' },
+      { id: 'm8',  bib: 8,  name: 'Даниел Кубашлиев',     country: '🇧🇬' },
+      { id: 'm9',  bib: 9,  name: 'Антон Кадиев',         country: '🇧🇬' },
+      { id: 'm10', bib: 10, name: 'Атанас Парашкевов',    country: '🇧🇬' },
+      { id: 'm11', bib: 11, name: 'Стилян Аврамов',       country: '🇧🇬' },
+      { id: 'm12', bib: 12, name: 'Христо Минков',        country: '🇧🇬' },
+      { id: 'm13', bib: 13, name: 'Владимир Ставрев',     country: '🇧🇬' },
+      { id: 'm14', bib: 14, name: 'Андриан Кърпаров',     country: '🇧🇬' },
+      { id: 'm15', bib: 15, name: 'Андрей Гридин',        country: '🇧🇬' },
+      { id: 'm16', bib: 16, name: 'Тодор Цанков',         country: '🇧🇬' },
+      { id: 'm17', bib: 17, name: 'Никола Кондарев',      country: '🇧🇬' },
+      { id: 'm18', bib: 18, name: 'Любомир Тодоров',      country: '🇧🇬' },
+      { id: 'm19', bib: 19, name: 'Георги Добрев',        country: '🇧🇬' },
+      { id: 'm20', bib: 20, name: 'Росен Русев',          country: '🇧🇬' },
+      { id: 'm21', bib: 21, name: 'Калоян Чанев',         country: '🇧🇬' },
+      { id: 'm22', bib: 22, name: 'Стефан Иванов',        country: '🇧🇬' },
+      { id: 'm23', bib: 23, name: 'Иво Андреев',          country: '🇧🇬' },
+      { id: 'm24', bib: 24, name: 'Julien Feutrie',       country: '🇫🇷' },
+      { id: 'm25', bib: 25, name: 'Тодор Георгиев',       country: '🇧🇬' },
+      { id: 'm26', bib: 26, name: 'Петко Стефанов',       country: '🇧🇬' },
+      { id: 'm27', bib: 27, name: 'Фатих Хюсеин',         country: '🇧🇬' },
+      { id: 'm28', bib: 28, name: 'Самуил Вълчев',        country: '🇧🇬' },
+      { id: 'm29', bib: 29, name: 'Ивайло Хаджиев',       country: '🇧🇬' },
+      { id: 'm30', bib: 30, name: 'Станимир Димитров',    country: '🇧🇬' },
+      { id: 'm31', bib: 31, name: 'Емил Недков',          country: '🇧🇬' },
+      { id: 'm32', bib: 32, name: 'Румен Костадинов',     country: '🇧🇬' },
+      { id: 'm33', bib: 33, name: 'Димитър Цанков',       country: '🇧🇬' },
+      { id: 'm34', bib: 34, name: 'Кольо Райчинов',       country: '🇧🇬' },
+      { id: 'm35', bib: 35, name: 'Кристиян Кирилов',     country: '🇧🇬' },
+      { id: 'm36', bib: 36, name: 'Никола Стойчев',       country: '🇧🇬' },
+      { id: 'm37', bib: 37, name: 'Васил Гуджев',         country: '🇧🇬' },
+      { id: 'm38', bib: 38, name: 'Виктор Методиев',      country: '🇧🇬' },
+      { id: 'm39', bib: 39, name: 'Константин Атанасов',  country: '🇧🇬' },
+      { id: 'm40', bib: 40, name: 'Иван Гочев',           country: '🇧🇬' },
+    ],
+    womenAthletes: [
+      { id: 'w1',  bib: 1,  name: 'Мария Николова',    country: '🇧🇬' },
+      { id: 'w2',  bib: 2,  name: 'Моника Филипова',   country: '🇧🇬' },
+      { id: 'w3',  bib: 3,  name: 'Надежда Ангелова',  country: '🇧🇬' },
+      { id: 'w4',  bib: 4,  name: 'Полина Горасова',   country: '🇧🇬' },
+      { id: 'w5',  bib: 5,  name: 'Антония Георгиева', country: '🇧🇬' },
+      { id: 'w6',  bib: 6,  name: 'Нели Петкова',      country: '🇧🇬' },
+      { id: 'w7',  bib: 7,  name: 'Елеонора Григорова',country: '🇧🇬' },
+      { id: 'w8',  bib: 8,  name: 'Боряна Николчева',  country: '🇧🇬' },
+      { id: 'w9',  bib: 9,  name: 'Вяра Кръстева',     country: '🇧🇬' },
+      { id: 'w10', bib: 10, name: 'Мирела Георгиева',  country: '🇧🇬' },
+      { id: 'w11', bib: 11, name: 'Тоня Тонева',       country: '🇧🇬' },
+      { id: 'w12', bib: 12, name: 'Златка Вълчева',    country: '🇧🇬' },
+      { id: 'w13', bib: 13, name: 'Анна Ванчева',      country: '🇧🇬' },
+      { id: 'w14', bib: 14, name: 'Лина Христова',     country: '🇧🇬' },
+    ],
+    results: {
+      men: {
+        finishers: [
+          { id: 'm1',  name: 'Христо Цветков',    country: '🇧🇬' },
+          { id: 'm2',  name: 'Димитър Шадура',    country: '🇧🇬' },
+          { id: 'm6',  name: 'Николай Стойчев',   country: '🇧🇬' },
+          { id: 'm9',  name: 'Антон Кадиев',      country: '🇧🇬' },
+          { id: 'm10', name: 'Атанас Парашкевов', country: '🇧🇬' },
+          { id: 'm12', name: 'Христо Минков',     country: '🇧🇬' },
+          { id: 'm14', name: 'Андриан Кърпаров',  country: '🇧🇬' },
+          { id: 'm17', name: 'Никола Кондарев',   country: '🇧🇬' },
+          { id: 'm19', name: 'Георги Добрев',     country: '🇧🇬' },
+          { id: 'm23', name: 'Иво Андреев',       country: '🇧🇬' },
+        ],
+        winnerTime: '6:56:40'
+      },
+      women: {
+        finishers: [
+          { id: 'w2',  name: 'Моника Филипова',  country: '🇧🇬' },
+          { id: 'w4',  name: 'Полина Горасова',  country: '🇧🇬' },
+          { id: 'w6',  name: 'Нели Петкова',     country: '🇧🇬' },
+          { id: 'w8',  name: 'Боряна Николчева', country: '🇧🇬' },
+          { id: 'w9',  name: 'Вяра Кръстева',    country: '🇧🇬' },
+          { id: 'w10', name: 'Мирела Георгиева', country: '🇧🇬' },
+          { id: 'w11', name: 'Тоня Тонева',      country: '🇧🇬' },
+          { id: 'w12', name: 'Златка Вълчева',   country: '🇧🇬' },
+          { id: 'w13', name: 'Анна Ванчева',     country: '🇧🇬' },
+          { id: 'w14', name: 'Лина Христова',    country: '🇧🇬' },
+        ],
+        winnerTime: '9:13:21'
+      }
+    },
+    hardcodedPrediction: {
+      _hardcoded: true,
+      author: { name: 'Ицо Пак Тича', initials: 'ИПТ', location: '21 Jun · 20:15', at: '21 Jun · 20:15', bg: '#2a3f1a', fg: '#8dc63f' },
+      men: {
+        time: '7:05:00',
+        picks: [
+          { id: 'm1',  name: 'Христо Цветков',     country: '🇧🇬' },
+          { id: 'm2',  name: 'Димитър Шадура',     country: '🇧🇬' },
+          { id: 'm3',  name: 'Пламен Пенов',       country: '🇧🇬' },
+          { id: 'm7',  name: 'Александър Христов', country: '🇧🇬' },
+          { id: 'm6',  name: 'Николай Стойчев',    country: '🇧🇬' },
+          { id: 'm9',  name: 'Антон Кадиев',       country: '🇧🇬' },
+          { id: 'm11', name: 'Стилян Аврамов',     country: '🇧🇬' },
+          { id: 'm12', name: 'Христо Минков',      country: '🇧🇬' },
+          { id: 'm14', name: 'Андриан Кърпаров',   country: '🇧🇬' },
+          { id: 'm10', name: 'Атанас Парашкевов',  country: '🇧🇬' },
+        ]
+      },
+      women: {
+        time: '8:50:00',
+        picks: [
+          { id: 'w2', name: 'Моника Филипова', country: '🇧🇬' },
+          { id: 'w1', name: 'Мария Николова',  country: '🇧🇬' },
+          { id: 'w4', name: 'Полина Горасова', country: '🇧🇬' },
+        ]
+      }
+    }
+  },
+
+  // ── ADD NEW RACES BELOW ───────────────────────────────────────────────────────
+  // pirin100: {
+  //   id: 'pirin100',
+  //   name: 'Pirin 100',
+  //   titleHtml: 'Pirin <em>100</em>',
+  //   subtitle: 'Mountain Ultra · Bansko, Bulgaria · Aug 15–16, 2026',
+  //   label: 'Race Predictions',
+  //   meta: [ ... ],
+  //   deadline: 'Predictions lock 1 hour before race start · Aug 15, 2026 at 06:00',
+  //   resultsTitle: 'Pirin 100 · 2026',
+  //   menAthletes: [ ... ],
+  //   womenAthletes: [ ... ],
+  //   results: { men: { finishers: [], winnerTime: null }, women: { finishers: [], winnerTime: null } },
+  //   hardcodedPrediction: null,
+  // },
+};
+
+// ── LOAD RACE FROM URL PARAM ──────────────────────────────────────────────────
+const urlRaceId = new URLSearchParams(window.location.search).get('race') || 'vitosha100';
+const RACE_CONFIG = RACES_REGISTRY[urlRaceId];
+if (!RACE_CONFIG) {
+  document.body.innerHTML = '<div style="padding:80px;text-align:center;font-family:monospace;color:#9aaa80">Race not found. <a href="index.html" style="color:#8dc63f">← Back to races</a></div>';
+  throw new Error('Race not found: ' + urlRaceId);
+}
+
+// ── EXPOSE AS LEGACY GLOBALS (rest of code uses these names) ──────────────────
+const MEN_ATHLETES    = RACE_CONFIG.menAthletes;
+const WOMEN_ATHLETES  = RACE_CONFIG.womenAthletes;
+const RACE_RESULTS    = RACE_CONFIG.results;
+const LS_KEY_RACE     = 'race_predictions_' + urlRaceId;
+
+// ── POPULATE HERO ─────────────────────────────────────────────────────────────
+document.title = RACE_CONFIG.name + ' — Race Predictions';
+document.getElementById('hero-label').textContent = RACE_CONFIG.label;
+document.getElementById('hero-title').innerHTML = RACE_CONFIG.titleHtml;
+document.getElementById('hero-sub').textContent = RACE_CONFIG.subtitle;
+document.getElementById('results-banner-title').textContent = RACE_CONFIG.resultsTitle;
+document.getElementById('submit-deadline').textContent = RACE_CONFIG.deadline;
+document.getElementById('hero-meta').innerHTML = RACE_CONFIG.meta.map((m, i) =>
+  (i > 0 ? '<div class="meta-divider"></div>' : '') +
+  `<div class="meta-item"><span class="meta-label">${m.label}</span><span class="meta-value">${m.value}</span></div>`
+).join('');
+
+
+// ── AVATAR HELPERS ────────────────────────────────────────────────────────────
+const AVATAR_PALETTES = [
+  { bg: '#1c3010', fg: '#8dc63f' }, { bg: '#2a1530', fg: '#e896b8' },
+  { bg: '#102030', fg: '#7ab8f5' }, { bg: '#2a1f10', fg: '#e8a830' },
+  { bg: '#1a1030', fg: '#b898f8' }, { bg: '#101a28', fg: '#60c8e8' },
+  { bg: '#281018', fg: '#e87080' }, { bg: '#101c10', fg: '#60c860' },
+];
+function nameToInitials(name) {
+  const parts = name.trim().split(/\s+/);
+  return parts.length >= 2 ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase() : name.slice(0,2).toUpperCase();
+}
+function nameToPalette(name) { return AVATAR_PALETTES[name.split('').reduce((a,c) => a + c.charCodeAt(0), 0) % AVATAR_PALETTES.length]; }
+
+// ── LOCALSTORAGE ──────────────────────────────────────────────────────────────
+const LS_KEY = LS_KEY_RACE; // race-specific key so each race has its own predictions
+
+function saveToStorage(preds) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(preds)); } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch(e) { return []; }
+}
+
+const HARDCODED_PREDICTION = RACE_CONFIG.hardcodedPrediction;
+
+function loadPredictions() {
+  const stored = loadFromStorage();
+  if (HARDCODED_PREDICTION) {
+    return [HARDCODED_PREDICTION, ...stored.filter(p => !p._hardcoded)];
+  }
+  return stored;
+}
+
+
+const predictions = loadPredictions();
+
+// ── MENTION COUNTS: how many times each athlete appears in predictions ────────
+function getMentionCounts(gender) {
+  const counts = new Map();
+  predictions.forEach(p => {
+    const picks = gender === 'men' ? p.men.picks : p.women.picks;
+    picks.forEach(a => { if (a) counts.set(a.id, (counts.get(a.id) || 0) + 1); });
+  });
+  return counts;
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const state = { men: { picks: Array(10).fill(null) }, women: { picks: Array(10).fill(null) } };
+let activeDropdown = null;
+
+function posLabel(i) { return ['1st','2nd','3rd'][i] || `${i+1}th`; }
+function posClass(i) { return ['pos-1','pos-2','pos-3'][i] || 'pos-other'; }
+function medal(i) { return ['🥇','🥈','🥉'][i] || ''; }
+
+// ── BUILD POSITIONS ───────────────────────────────────────────────────────────
+function buildPositionsGrid(gender) {
+  const athletes = gender === 'men' ? MEN_ATHLETES : WOMEN_ATHLETES;
+  const grid = document.getElementById(`positions-${gender}`);
+  grid.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const row = document.createElement('div');
+    row.className = 'position-row' + (i < 3 ? ' required-pick' : '');
+    row.id = `row-${gender}-${i}`;
+
+    const badge = document.createElement('div');
+    badge.className = `pos-badge ${posClass(i)}`;
+    badge.textContent = posLabel(i);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'select-wrapper';
+
+    const trigger = document.createElement('button');
+    trigger.className = 'athlete-select-trigger';
+    trigger.type = 'button';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'trigger-name';
+    nameSpan.textContent = 'Select athlete…';
+
+    const arrow = document.createElement('span');
+    arrow.className = 'trigger-arrow';
+    arrow.textContent = '▼';
+
+    trigger.appendChild(nameSpan);
+    trigger.appendChild(arrow);
+    trigger.addEventListener('click', e => { e.stopPropagation(); openDropdown(gender, i, trigger, athletes); });
+
+    wrapper.appendChild(trigger);
+    row.appendChild(badge);
+    row.appendChild(wrapper);
+    grid.appendChild(row);
+  }
+}
+
+// ── DROPDOWN ──────────────────────────────────────────────────────────────────
+function openDropdown(gender, posIdx, triggerEl, athletes) {
+  if (activeDropdown && activeDropdown.gender === gender && activeDropdown.posIdx === posIdx) { closeDropdown(); return; }
+  closeDropdown();
+
+  const portal = document.getElementById('dropdown-portal');
+  const rect = triggerEl.getBoundingClientRect();
+  portal.innerHTML = '';
+  portal.style.width = Math.max(250, rect.width + 80) + 'px';
+  portal.style.maxWidth = '320px';
+
+  const below = window.innerHeight - rect.bottom - 8;
+  const above = rect.top - 8;
+  if (below < 280 && above > below) {
+    portal.style.top = 'auto';
+    portal.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+  } else {
+    portal.style.top = (rect.bottom + 4) + 'px';
+    portal.style.bottom = 'auto';
+  }
+  portal.style.left = Math.min(rect.left, window.innerWidth - parseInt(portal.style.width) - 8) + 'px';
+
+  const searchBox = document.createElement('div');
+  searchBox.className = 'dropdown-search';
+  searchBox.innerHTML = '<span class="search-icon">⌕</span>';
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Search name or bib…';
+  searchInput.autocomplete = 'off';
+  searchBox.appendChild(searchInput);
+
+  const list = document.createElement('div');
+  list.className = 'dropdown-list';
+
+  const takenIds = new Set(state[gender].picks.filter((p, idx) => p !== null && idx !== posIdx).map(p => p.id));
+  const mentionCounts = getMentionCounts(gender);
+
+  function renderList(filter) {
+    list.innerHTML = '';
+    const lf = filter.toLowerCase();
+    const filtered = athletes.filter(a => a.name.toLowerCase().includes(lf) || a.bib.toString().includes(filter));
+    if (!filtered.length) { list.innerHTML = '<div class="no-results">No athletes found</div>'; return; }
+
+    const alpha = (a, b) => a.name.localeCompare(b.name, 'bg');
+    const favs = filtered.filter(a => mentionCounts.has(a.id)).sort(alpha);
+    const rest = filtered.filter(a => !mentionCounts.has(a.id)).sort(alpha);
+
+    function addOpt(a) {
+      const opt = document.createElement('div');
+      opt.className = 'dropdown-option';
+      if (takenIds.has(a.id)) opt.classList.add('disabled');
+      const cur = state[gender].picks[posIdx];
+      if (cur && cur.id === a.id) opt.classList.add('selected');
+      const count = mentionCounts.get(a.id);
+      const starHtml = count
+        ? `<span class="opt-star" title="${count}×mentioned">★<span class="opt-star-count">${count}</span></span>`
+        : `<span class="opt-star-empty">★</span>`;
+      opt.innerHTML = `${starHtml}<span class="opt-number">#${a.bib}</span><span>${a.name}</span><span class="opt-country">${a.country}</span>`;
+      opt.addEventListener('mousedown', e => { e.preventDefault(); selectAthlete(gender, posIdx, a); closeDropdown(); });
+      list.appendChild(opt);
+    }
+
+    if (favs.length && !filter) {
+      const l1 = document.createElement('div'); l1.className = 'dropdown-section-label'; l1.textContent = '★ mentioned in predictions'; list.appendChild(l1);
+      favs.forEach(addOpt);
+      if (rest.length) {
+        const l2 = document.createElement('div'); l2.className = 'dropdown-section-label'; l2.textContent = 'all athletes'; list.appendChild(l2);
+        rest.forEach(addOpt);
+      }
+    } else {
+      filtered.sort(alpha).forEach(addOpt);
+    }
+  }
+
+  renderList('');
+  searchInput.addEventListener('input', () => renderList(searchInput.value));
+  portal.appendChild(searchBox);
+  portal.appendChild(list);
+  portal.classList.add('open');
+
+  const arrow = triggerEl.querySelector('.trigger-arrow');
+  if (arrow) arrow.classList.add('open');
+  activeDropdown = { gender, posIdx, triggerEl, arrow };
+  requestAnimationFrame(() => searchInput.focus());
+}
+
+function closeDropdown() {
+  if (!activeDropdown) return;
+  document.getElementById('dropdown-portal').classList.remove('open');
+  if (activeDropdown.arrow) activeDropdown.arrow.classList.remove('open');
+  activeDropdown = null;
+}
+
+document.addEventListener('click', e => { if (!document.getElementById('dropdown-portal').contains(e.target)) closeDropdown(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); closeModal(); closeScoringExplainer(); } });
+window.addEventListener('scroll', () => {
+  if (!activeDropdown) return;
+  // Reposition dropdown instead of closing it
+  const { triggerEl } = activeDropdown;
+  const portal = document.getElementById('dropdown-portal');
+  const rect = triggerEl.getBoundingClientRect();
+  const below = window.innerHeight - rect.bottom - 8;
+  const above = rect.top - 8;
+  if (below < 280 && above > below) {
+    portal.style.top = 'auto';
+    portal.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+  } else {
+    portal.style.top = (rect.bottom + 4) + 'px';
+    portal.style.bottom = 'auto';
+  }
+  portal.style.left = Math.min(rect.left, window.innerWidth - parseInt(portal.style.width) - 8) + 'px';
+}, true);
+
+function selectAthlete(gender, posIdx, a) {
+  state[gender].picks[posIdx] = a;
+  const row = document.getElementById(`row-${gender}-${posIdx}`);
+  const ns = row.querySelector('.trigger-name');
+  ns.textContent = `#${a.bib} ${a.name} ${a.country}`;
+  ns.classList.add('selected');
+  updatePickedCount(gender);
+}
+
+function updatePickedCount(gender) {
+  const n = state[gender].picks.filter(p => p !== null).length;
+  document.getElementById(`${gender}-picked-count`).textContent = `${n} / 10 picked`;
+}
+
+function togglePositions(gender) {
+  const grid = document.getElementById(`positions-${gender}`);
+  const btn = grid.parentElement.querySelector('.show-more-btn');
+  const c = grid.classList.toggle('positions-collapsed');
+  btn.textContent = c ? 'show up to 10' : 'show less';
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+function getTime(gender) {
+  const h = parseInt(document.getElementById(`${gender}-h`).value) || 0;
+  const m = parseInt(document.getElementById(`${gender}-m`).value) || 0;
+  const s = parseInt(document.getElementById(`${gender}-s`).value) || 0;
+  if (!h && !m && !s) return null;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function submitPrediction() {
+  const mp = state.men.picks;
+  const wp = state.women.picks;
+  let errors = [];
+
+  // Validate name
+  const nameEl = document.getElementById('submitter-name');
+  const submitterName = nameEl.value.trim();
+  if (!submitterName) {
+    errors.push('name');
+    nameEl.classList.add('required-error');
+    setTimeout(() => nameEl.classList.remove('required-error'), 600);
+  }
+
+  // Validate top-3 picks for men
+  for (let i = 0; i < 3; i++) {
+    if (!mp[i]) {
+      errors.push(`men-pick-${i}`);
+      document.getElementById(`row-men-${i}`).classList.add('required-error');
+      setTimeout(() => document.getElementById(`row-men-${i}`).classList.remove('required-error'), 600);
+    }
+  }
+  // Validate top-3 picks for women
+  for (let i = 0; i < 3; i++) {
+    if (!wp[i]) {
+      errors.push(`women-pick-${i}`);
+      document.getElementById(`row-women-${i}`).classList.add('required-error');
+      setTimeout(() => document.getElementById(`row-women-${i}`).classList.remove('required-error'), 600);
+    }
+  }
+
+  // Validate men's time
+  const menTime = getTime('men');
+  if (!menTime) {
+    errors.push('men-time');
+    // time input enforcement — only digits, max 2 chars, hard value clamp
+  [
+    { id: 'men-h',   max: 19 },
+    { id: 'men-m',   max: 59 },
+    { id: 'men-s',   max: 59 },
+    { id: 'women-h', max: 19 },
+    { id: 'women-m', max: 59 },
+    { id: 'women-s', max: 59 },
+  ].forEach(({ id, max }) => {
+    const el = document.getElementById(id);
+
+    function enforce() {
+      // strip non-digits
+      let val = el.value.replace(/[^0-9]/g, '');
+      // clamp to max
+      if (val !== '') {
+        const n = parseInt(val, 10);
+        if (n > max) val = String(max);
+      }
+      if (el.value !== val) el.value = val;
+    }
+
+    el.addEventListener('keydown', function(e) {
+      // allow control keys
+      if (e.ctrlKey || e.metaKey) return;
+      if (['Backspace','Delete','Tab','ArrowLeft','ArrowRight'].includes(e.key)) return;
+      // block non-digits
+      if (!/^[0-9]$/.test(e.key)) { e.preventDefault(); return; }
+      // block if adding this digit would exceed max
+      const sel = this.value.slice(0, this.selectionStart) + e.key + this.value.slice(this.selectionEnd);
+      const stripped = sel.replace(/[^0-9]/g, '').slice(0, 2);
+      if (parseInt(stripped, 10) > max) { e.preventDefault(); }
+    });
+
+    el.addEventListener('input', enforce);
+    el.addEventListener('blur',  enforce);
+    el.addEventListener('paste', function(e) {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 2);
+      const n = parseInt(pasted, 10);
+      this.value = isNaN(n) ? '' : String(Math.min(max, n));
+    });
+  });
+
+  ['men-h','men-m','men-s'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.add('required-error');
+      setTimeout(() => el.classList.remove('required-error'), 600);
+    });
+  }
+  // Validate women's time
+  const womenTime = getTime('women');
+  if (!womenTime) {
+    errors.push('women-time');
+    ['women-h','women-m','women-s'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.add('required-error');
+      setTimeout(() => el.classList.remove('required-error'), 600);
+    });
+  }
+
+  if (errors.length) {
+    const msgs = [];
+    if (errors.includes('name')) msgs.push('your name');
+    const menPickErrors = errors.filter(e => e.startsWith('men-pick')).length;
+    const womenPickErrors = errors.filter(e => e.startsWith('women-pick')).length;
+    if (menPickErrors) msgs.push(`men's top ${menPickErrors === 1 ? posLabel(mp.findIndex(p => !p)) : '3'}`);
+    if (womenPickErrors) msgs.push(`women's top ${womenPickErrors === 1 ? posLabel(wp.findIndex(p => !p)) : '3'}`);
+    if (errors.includes('men-time')) msgs.push("men's winner time");
+    if (errors.includes('women-time')) msgs.push("women's winner time");
+    showErrorToast('Please fill in: ' + msgs.join(', ') + '.');
+    return;
+  }
+
+  const now = new Date();
+  const palette = nameToPalette(submitterName);
+  const at = now.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' · ' + now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  const newPred = {
+    _user: true,
+    id: Date.now(),
+    author: { name: submitterName, initials: nameToInitials(submitterName), bg: palette.bg, fg: palette.fg, location: at, at },
+    men:   { picks: [...state.men.picks],   time: menTime },
+    women: { picks: [...state.women.picks], time: womenTime }
+  };
+  predictions.unshift(newPred);
+  saveToStorage(predictions);
+  renderPredictionCards();
+  renderLeaderboard();
+  showToast('✓ Prediction submitted!');
+  state.men.picks = Array(10).fill(null);
+  state.women.picks = Array(10).fill(null);
+  buildPositionsGrid('men');
+  buildPositionsGrid('women');
+  updatePickedCount('men');
+  updatePickedCount('women');
+  ['men-h','men-m','men-s','women-h','women-m','women-s'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('submitter-name').value = '';
+}
+
+// ── RENDER CARDS ──────────────────────────────────────────────────────────────
+function renderPredictionCards() {
+  const container = document.getElementById('predictions-container');
+  document.getElementById('total-predictions-count').textContent = `${predictions.length} prediction${predictions.length !== 1 ? 's' : ''}`;
+  if (!predictions.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏔</div>No predictions yet. Be the first!</div>'; return; }
+
+  const wrap = document.createElement('div');
+  wrap.className = 'pred-cards';
+
+  // Build score ranks once for this render cycle
+  const _scoredAll = predictions.map(p => ({ p, score: scorePrediction(p) }));
+  _scoredAll.sort((a, b) => b.score.total - a.score.total);
+  const _rankMap = new Map(_scoredAll.map(({p}, i) => [p, i]));
+
+  predictions.forEach((p, idx) => {
+    const mp = p.men.picks;
+    const wp = p.women.picks;
+    const score = scorePrediction(p);
+    const rank  = _rankMap.get(p) ?? 99;
+
+    function picksBlock(picks, time, gClass, label, resultFinishers, timePts, winnerTime) {
+      const actualPos = new Map(); resultFinishers.forEach((a, i) => actualPos.set(a.id, i));
+      const rows = [];
+      for (let i = 0; i < 10; i++) {
+        const a = picks[i] || null;
+        if (!a) {
+          rows.push(`<div class="pick-row pick-row-empty">
+            <span class="pick-pos">${posLabel(i)}</span>
+            <span class="pick-medal">${medal(i)}</span>
+            <span class="pick-name pick-name-empty">—</span>
+            <span class="pick-pts pts-miss">0</span>
+          </div>`);
+          continue;
+        }
+        const slotMax = slotWeight(i);
+        let tier = 'miss', dist = null, earned = 0, tooltipText = 'not in top 10';
+        let actualResultLabel = '';
+        if (actualPos.has(a.id)) {
+          const ap = actualPos.get(a.id);
+          dist = Math.abs(ap - i);
+          const frac = proximityFraction(dist);
+          earned = slotMax * frac;
+          tier = pickTier(dist, true);
+          tooltipText = pickTierLabel(dist, true);
+          actualResultLabel = `<span class="pick-actual-pos">(${posLabel(ap)})</span>`;
+        } else {
+          actualResultLabel = `<span class="pick-actual-pos pick-actual-miss">(not top 10)</span>`;
+        }
+        const ptsLabel = earned > 0 ? `+${earned.toFixed(1)}` : '0';
+        const ptsChip = `<span class="pick-pts pts-${tier}">${ptsLabel}</span>
+          <span class="pick-pts-tooltip">${tooltipText}</span>`;
+        rows.push(`<div class="pick-row">
+          <span class="pick-pos">${posLabel(i)}</span>
+          <span class="pick-medal">${medal(i)}</span>
+          <span class="pick-name${i < 3 ? ' top' : ''}">${a.name}${actualResultLabel}</span>
+          ${ptsChip}
+        </div>`);
+      }
+      const timePtsRounded = Math.round(timePts * 10) / 10;
+      const timePtsTier = timePtsRounded >= W_TIME * 0.8 ? 'exact' : timePtsRounded >= W_TIME * 0.5 ? 'close' : timePtsRounded >= W_TIME * 0.2 ? 'near' : timePtsRounded > 0 ? 'far' : 'miss';
+      const timePtsLabel = timePtsRounded > 0 ? `+${timePtsRounded.toFixed(1)}` : '0';
+      let timeTooltip = 'no time predicted';
+      if (time && winnerTime) {
+        const diffMins = timeToMins(time) - timeToMins(winnerTime);
+        const absDiff = Math.abs(diffMins);
+        const sign = diffMins > 0 ? '+' : '−';
+        const diffM = Math.floor(absDiff);
+        const diffS = Math.round((absDiff - diffM) * 60);
+        const diffStr = diffS > 0 ? `${sign}${diffM}m ${diffS}s` : `${sign}${diffM}m`;
+        timeTooltip = `${diffStr} vs actual · ${timePtsRounded.toFixed(1)} / ${W_TIME.toFixed(1)} pts`;
+      }
+      const timeHtml = time
+        ? `<div class="pick-time-row"><span class="pick-time-lbl">predicted time</span><span class="pick-time">${time}</span>${winnerTime ? `<span class="pick-actual-time">(${winnerTime})</span>` : ''}<span class="pick-pts pts-${timePtsTier} pick-pts-hoverable">${timePtsLabel}<span class="pick-pts-tooltip pick-pts-tooltip-time">${timeTooltip}</span></span></div>`
+        : '<div class="pick-no-time">No time prediction</div>';
+      return `<div class="pred-detail-col"><h4 class="${gClass}">${label}</h4>${timeHtml}<div class="pick-list">${rows.join('')}</div></div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'pred-card';
+    card.innerHTML = `
+      <div class="pred-card-header" data-idx="${idx}">
+        <div class="pred-avatar" style="background:${p.author.bg};color:${p.author.fg}">${p.author.initials}</div>
+        <div class="pred-author-info">
+          <div class="pred-author-name">${p.author.name}</div>
+          <div class="pred-author-meta">${p.author.location} · ${p.author.at}</div>
+        </div>
+        <div class="pred-quick">
+          <div class="pred-quick-item"><span class="pred-quick-label">♂ 1st</span><span class="pred-quick-val">${mp[0] ? mp[0].name.split(' ')[0] : '—'}</span></div>
+          <div class="pred-quick-item"><span class="pred-quick-label">♀ 1st</span><span class="pred-quick-val">${wp[0] ? wp[0].name.split(' ')[0] : '—'}</span></div>
+          ${scoreBadgeHtml(score, rank)}
+        </div>
+        <div class="pred-toggle-wrap">
+          <button class="scoring-info-btn" onclick="openScoringExplainer(event)" title="How scoring works">?</button>
+          <span class="pred-chevron">▶</span>
+        </div>
+      </div>
+      <div class="pred-card-body">
+        <div class="pred-detail-cols">
+          ${picksBlock(mp, p.men.time, 'men-h', '♂ Men\'s picks', RACE_RESULTS.men.finishers, score.menTime, RACE_RESULTS.men.winnerTime)}
+          ${picksBlock(wp, p.women.time, 'women-h', '♀ Women\'s picks', RACE_RESULTS.women.finishers, score.womenTime, RACE_RESULTS.women.winnerTime)}
+        </div>
+        <button class="btn-full-detail" data-modal="${idx}">view full prediction ↗</button>
+        <div style="clear:both"></div>
+      </div>`;
+
+    card.querySelector('.pred-card-header').addEventListener('click', () => { card.classList.toggle('open'); });
+    card.querySelector('.btn-full-detail').addEventListener('click', e => { e.stopPropagation(); openModal(idx); });
+    wrap.appendChild(card);
+  });
+
+  container.innerHTML = '';
+  container.appendChild(wrap);
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(idx) {
+  const p = predictions[idx];
+
+  document.getElementById('modal-header').innerHTML = `
+    <div class="modal-avatar" style="background:${p.author.bg};color:${p.author.fg}">${p.author.initials}</div>
+    <div>
+      <div class="modal-author-name">${p.author.name}</div>
+      <div class="modal-author-sub">${p.author.location} · ${p.author.at}</div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">✕</button>`;
+
+  function colHtml(picks, time, gClass, label, resultFinishers, timePts, winnerTime) {
+    const actualPos = new Map(); resultFinishers.forEach((a, i) => actualPos.set(a.id, i));
+    const rows = [];
+    for (let i = 0; i < 10; i++) {
+      const a = picks[i] || null;
+      if (!a) {
+        rows.push(`<div class="modal-pick-row modal-pick-row-empty">
+          <span class="modal-pick-pos">${posLabel(i)}</span>
+          <span class="modal-pick-medal">${medal(i)}</span>
+          <span class="modal-pick-name" style="color:var(--text3);font-style:italic">—</span>
+          <span class="modal-pick-country"></span>
+          <span class="modal-pick-pts pts-miss">0</span>
+        </div>`);
+        continue;
+      }
+      const slotMax = slotWeight(i);
+      let tier = 'miss', earned = 0, dist = null;
+      let actualResultLabel = '';
+      if (actualPos.has(a.id)) {
+        const ap = actualPos.get(a.id);
+        dist = Math.abs(ap - i);
+        earned = slotMax * proximityFraction(dist);
+        tier = pickTier(dist, true);
+        actualResultLabel = `<span class="modal-actual-pos">(${posLabel(ap)})</span>`;
+      } else {
+        actualResultLabel = `<span class="modal-actual-pos modal-actual-miss">(not top 10)</span>`;
+      }
+      const ptsLabel = earned > 0 ? `+${earned.toFixed(1)}` : '0';
+      rows.push(`<div class="modal-pick-row">
+        <span class="modal-pick-pos">${posLabel(i)}</span>
+        <span class="modal-pick-medal">${medal(i)}</span>
+        <span class="modal-pick-name${i < 3 ? ' top' : ''}">${a.name}</span>
+        <span class="modal-pick-country">${actualResultLabel}</span>
+        <span class="modal-pick-pts pts-${tier}" title="${pickTierLabel(dist, dist !== null)}">${ptsLabel}</span>
+      </div>`);
+    }
+    const timePtsRounded = Math.round(timePts * 10) / 10;
+    const timePtsTier = timePtsRounded >= W_TIME * 0.8 ? 'exact' : timePtsRounded >= W_TIME * 0.5 ? 'close' : timePtsRounded >= W_TIME * 0.2 ? 'near' : timePtsRounded > 0 ? 'far' : 'miss';
+    const timePtsLabel = timePtsRounded > 0 ? `+${timePtsRounded.toFixed(1)}` : '0';
+    let timeTooltip = 'no time predicted';
+    if (time && winnerTime) {
+      const diffMins = timeToMins(time) - timeToMins(winnerTime);
+      const absDiff = Math.abs(diffMins);
+      const sign = diffMins > 0 ? '+' : '−';
+      const diffM = Math.floor(absDiff);
+      const diffS = Math.round((absDiff - diffM) * 60);
+      const diffStr = diffS > 0 ? `${sign}${diffM}m ${diffS}s` : `${sign}${diffM}m`;
+      timeTooltip = `${diffStr} vs actual · ${timePtsRounded.toFixed(1)} / ${W_TIME.toFixed(1)} pts`;
+    }
+    const timeHtml = time
+      ? `<div class="modal-time-box"><span class="modal-time-label">predicted finish</span><span class="modal-time-val">${time}</span>${winnerTime ? `<span class="pick-actual-time">(${winnerTime})</span>` : ''}<span class="modal-pick-pts pts-${timePtsTier} pick-pts-hoverable" style="margin-left:auto">${timePtsLabel}<span class="pick-pts-tooltip pick-pts-tooltip-time">${timeTooltip}</span></span></div>`
+      : `<div class="modal-no-time">No time prediction submitted</div>`;
+    return `<div class="modal-col"><h4 class="${gClass}">${label}</h4>${timeHtml}<div class="modal-pick-rows">${rows.join('')}</div></div>`;
+  }
+
+  const modalScore = scorePrediction(p);
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-cols">
+      ${colHtml(p.men.picks, p.men.time, 'men-h', '♂ Men\'s top 10', RACE_RESULTS.men.finishers, modalScore.menTime, RACE_RESULTS.men.winnerTime)}
+      ${colHtml(p.women.picks, p.women.time, 'women-h', '♀ Women\'s top 10', RACE_RESULTS.women.finishers, modalScore.womenTime, RACE_RESULTS.women.winnerTime)}
+    </div>`;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function handleOverlayClick(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+// ── SCORING EXPLAINER ─────────────────────────────────────────────────────────
+function openScoringExplainer(e) {
+  e.stopPropagation();
+  document.getElementById('scoring-popover-overlay').classList.add('open');
+}
+function closeScoringExplainer() {
+  document.getElementById('scoring-popover-overlay').classList.remove('open');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.classList.remove('error');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showErrorToast(msg) {
+  const t = document.getElementById('toast');
+  t.classList.add('error');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => { t.classList.remove('show'); t.classList.remove('error'); }, 4000);
+}
+
+
+
+// ── SCORING ENGINE ────────────────────────────────────────────────────────────
+// Weight design (max 110 pts):
+//   Men winner time      : 10 pts   (linear decay over 60 min)
+//   Women winner time    : 10 pts
+//   Men  top-3 picks     : 10 pts max each  (proximity decay by distance)
+//   Women top-3 picks    : 10 pts max each
+//   Men  positions 4-6   : 5 pts max each
+//   Women positions 4-6  : 5 pts max each
+//   Men  positions 7-10  : 3.75 pts max each
+//   Women positions 7-10 : 3.75 pts max each
+//
+// Proximity scale (fraction of slot max, based on |predicted - actual| distance):
+//   dist 0  → 1.00  (exact)
+//   dist 1  → 0.80  (one off)
+//   dist 2  → 0.60  (two off)
+//   dist 3  → 0.40  (three off)
+//   dist 4  → 0.20  (four off)
+//   dist 5+ → 0.10  (still in top-10 but way off)
+//   not in top-10 → 0
+const W_TOP3  = 10;
+const W_MID   = 5;
+const W_LOW   = 3.75;
+const W_TIME  = 10;
+const MAX_TIME_DIFF_MINS = 60;
+
+const PROXIMITY_SCALE = [1.00, 0.80, 0.60, 0.40, 0.20, 0.10];
+
+function slotWeight(pos) {
+  if (pos < 3) return W_TOP3;
+  if (pos < 6) return W_MID;
+  return W_LOW;
+}
+
+function proximityFraction(dist) {
+  if (dist < 0) return 0;
+  return PROXIMITY_SCALE[Math.min(dist, PROXIMITY_SCALE.length - 1)];
+}
+
+function pickTier(dist, inTop10) {
+  if (!inTop10) return 'miss';
+  if (dist === 0) return 'exact';
+  if (dist === 1) return 'close';
+  if (dist <= 3) return 'near';
+  return 'far';
+}
+
+function pickTierLabel(dist, inTop10) {
+  if (!inTop10) return 'not in top 10';
+  if (dist === 0) return 'exact!';
+  if (dist === 1) return `off by 1`;
+  if (dist <= 3) return `off by ${dist}`;
+  return `off by ${dist}`;
+}
+
+function timeToMins(t) {
+  if (!t) return null;
+  const [h, m, s] = t.split(':').map(Number);
+  return h * 60 + m + s / 60;
+}
+
+function scoreTime(predicted, actual) {
+  if (!predicted || !actual) return 0;
+  const diff = Math.abs(timeToMins(predicted) - timeToMins(actual));
+  if (diff >= MAX_TIME_DIFF_MINS) return 0;
+  return W_TIME * (1 - diff / MAX_TIME_DIFF_MINS);
+}
+
+function scorePicks(picks, resultFinishers) {
+  const actualPos = new Map();
+  resultFinishers.forEach((a, i) => actualPos.set(a.id, i));
+  let pts = 0;
+  const detail = [];
+  picks.forEach((pick, predPos) => {
+    if (!pick) return;
+    const slotMax = slotWeight(predPos);
+    if (!actualPos.has(pick.id)) {
+      detail.push({ predPos, pick, status: 'miss', tier: 'miss', dist: null, pts: 0, slotMax });
+      return;
+    }
+    const ap = actualPos.get(pick.id);
+    const dist = Math.abs(ap - predPos);
+    const frac = proximityFraction(dist);
+    const earned = slotMax * frac;
+    pts += earned;
+    detail.push({ predPos, pick, actualPos: ap, dist, status: dist === 0 ? 'exact' : 'near', tier: pickTier(dist, true), pts: earned, slotMax, frac });
+  });
+  return { pts, detail };
+}
+
+function scorePrediction(pred) {
+  const menPicks   = scorePicks(pred.men.picks,   RACE_RESULTS.men.finishers);
+  const womenPicks = scorePicks(pred.women.picks, RACE_RESULTS.women.finishers);
+  const menTime    = scoreTime(pred.men.time,   RACE_RESULTS.men.winnerTime);
+  const womenTime  = scoreTime(pred.women.time, RACE_RESULTS.women.winnerTime);
+  const total = menPicks.pts + womenPicks.pts + menTime + womenTime;
+  return {
+    total: Math.round(total * 10) / 10,
+    menPicks,
+    womenPicks,
+    menTime:   Math.round(menTime * 10) / 10,
+    womenTime: Math.round(womenTime * 10) / 10,
+  };
+}
+
+// ── RENDER RESULTS BANNER ─────────────────────────────────────────────────────
+function renderResultsBanner() {
+  const grid = document.getElementById('results-grid');
+  function colHtml(finishers, winnerTime, gClass, label) {
+    const rows = finishers.map((a, i) => `
+      <div class="result-row">
+        <span class="result-pos">${posLabel(i)}</span>
+        <span>${medal(i)}</span>
+        <span class="result-name${i < 3 ? ' top' : ''}">${a.name}</span>
+      </div>`).join('');
+    return `<div class="results-col">
+      <h4 class="${gClass}">${label}</h4>
+      <div class="result-time-row">
+        <span class="result-time-lbl">Winner time</span>
+        <span class="result-time-val">${winnerTime}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }
+  grid.innerHTML =
+    colHtml(RACE_RESULTS.men.finishers,   RACE_RESULTS.men.winnerTime,   'men-h',   '♂ Men') +
+    colHtml(RACE_RESULTS.women.finishers, RACE_RESULTS.women.winnerTime, 'women-h', '♀ Women');
+}
+
+// ── RENDER LEADERBOARD ────────────────────────────────────────────────────────
+function renderLeaderboard() {
+  const table = document.getElementById('leaderboard-table');
+  if (!predictions.length) {
+    table.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:14px;">No predictions yet.</div>';
+    return;
+  }
+  const scored = predictions.map(p => ({ p, score: scorePrediction(p) }));
+  scored.sort((a, b) => b.score.total - a.score.total);
+  const rankClass = i => ['r1','r2','r3'][i] || '';
+  const rankMedal = i => ['🥇','🥈','🥉'][i] || '';
+  table.innerHTML = scored.map(({ p, score }, i) => `
+    <div class="lb-row">
+      <span class="lb-rank ${rankClass(i)}">${rankMedal(i) || '#' + (i+1)}</span>
+      <div class="lb-avatar" style="background:${p.author.bg};color:${p.author.fg}">${p.author.initials}</div>
+      <span class="lb-name">${p.author.name}</span>
+      <span class="lb-breakdown">♂ ${score.menPicks.pts.toFixed(1)} &nbsp;♀ ${score.womenPicks.pts.toFixed(1)} &nbsp;⏱ ${(score.menTime+score.womenTime).toFixed(1)}</span>
+      <span class="lb-score">${score.total}<span style="font-size:10px;opacity:0.5"> /110</span></span>
+    </div>`).join('');
+}
+
+// ── SCORE BADGE ───────────────────────────────────────────────────────────────
+function getScoreRank(pred) {
+  const scored = predictions.map(p => ({ p, score: scorePrediction(p) }));
+  scored.sort((a, b) => b.score.total - a.score.total);
+  return scored.findIndex(s => s.p === pred || (s.p.id && s.p.id === pred.id));
+}
+
+function scoreBadgeHtml(score, rank) {
+  const cls  = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : 'plain';
+  const icon = rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : '🎯';
+  return `<span class="score-badge ${cls}" title="Score breakdown: ♂picks ${score.menPicks.pts.toFixed(1)} + ♀picks ${score.womenPicks.pts.toFixed(1)} + times ${(score.menTime+score.womenTime).toFixed(1)}">${icon} ${score.total}<span class="score-pts"> pts</span></span>`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildPositionsGrid('men');
+buildPositionsGrid('women');
+renderResultsBanner();
+renderPredictionCards();
+renderLeaderboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Race Predictions Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0c0f0a; --bg2: #141810; --bg3: #1a2016;
+    --surface: #1f271a; --surface2: #273120;
+    --border: rgba(160,200,100,0.12); --border2: rgba(160,200,100,0.22);
+    --green: #8dc63f; --green2: #b8e06a; --green-dim: rgba(141,198,63,0.15);
+    --amber: #e8a830;
+    --text: #e8edd8; --text2: #9aaa80; --text3: #5a6a48;
+    --radius: 10px;
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'Figtree', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 72px 24px 60px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #111a0d 0%, var(--bg) 100%);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(141,198,63,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green);
+    background: var(--green-dim);
+    border: 1px solid rgba(141,198,63,0.3);
+    padding: 5px 16px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+  .hero-badge::before { content: '⛰'; font-size: 13px; }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(44px, 7vw, 80px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  .hero h1 em { color: var(--green); font-style: italic; }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--text2);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 56px 24px 100px;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── RACE GRID ── */
+  .race-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+
+  .race-card {
+    display: block;
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.18s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+    animation: fadeUp 0.4s ease both;
+  }
+  .race-card:nth-child(1) { animation-delay: 0.05s; }
+  .race-card:nth-child(2) { animation-delay: 0.12s; }
+  .race-card:nth-child(3) { animation-delay: 0.19s; }
+  .race-card:nth-child(4) { animation-delay: 0.26s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .race-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .race-card:hover .card-go { color: var(--green2); }
+  .race-card:hover .card-accent { opacity: 1; }
+
+  .card-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--green), var(--green2));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card-header {
+    padding: 20px 22px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    background: var(--green-dim);
+    border: 1px solid rgba(141,198,63,0.18);
+  }
+
+  .card-status {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 100px;
+  }
+  .status-open    { color: var(--green);  background: var(--green-dim);            border: 1px solid rgba(141,198,63,0.25); }
+  .status-results { color: #e8a830;       background: rgba(232,168,48,0.1);        border: 1px solid rgba(232,168,48,0.25); }
+  .status-soon    { color: var(--text3);  background: var(--bg3);                  border: 1px solid var(--border); }
+
+  .card-body { padding: 16px 22px 20px; }
+
+  .card-name {
+    font-family: var(--font-display);
+    font-size: 26px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .card-name em { color: var(--green); font-style: italic; }
+
+  .card-tagline {
+    font-size: 13px;
+    color: var(--text3);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+
+  .card-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .card-stat { display: flex; flex-direction: column; }
+  .stat-label { font-size: 10px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; }
+  .stat-value { font-size: 14px; font-weight: 600; color: var(--text); }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    padding: 14px 22px;
+  }
+  .card-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .card-go {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    transition: color 0.15s;
+  }
+
+  /* ── COMING SOON ── */
+  .race-card.coming-soon {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .race-card.coming-soon .card-accent { display: none; }
+
+  /* ── FOOTER BLURB ── */
+  .footer-blurb {
+    text-align: center;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .footer-blurb p {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Race Predictions</div>
+  <h1>Pick your <em>race</em></h1>
+  <p class="hero-sub">Choose a race below to submit your predictions and compete on the leaderboard.</p>
+</div>
+
+<div class="main">
+  <div class="section-label">Active races</div>
+
+  <div class="race-grid" id="race-grid"></div>
+</div>
+
+<div class="footer-blurb">
+  <p>More races coming soon · built for the community</p>
+</div>
+
+<script>
+// ── RACE REGISTRY ─────────────────────────────────────────────────────────────
+// Add more races here — each entry maps to the race.html template via ?race=id
+const RACES = [
+  {
+    id: 'vitosha100',
+    name: 'Vitosha',
+    nameEm: '100',
+    tagline: 'Trail Ultramarathon · Sofia, BG',
+    icon: '🏔',
+    distance: '99.2 km',
+    elevation: '1 875 m',
+    athletes: '789',
+    date: 'Jun 27–28, 2026',
+    status: 'results',   // 'open' | 'results' | 'soon'
+  },
+  {
+    id: 'pirin100',
+    name: 'Pirin',
+    nameEm: '100',
+    tagline: 'Mountain Ultra · Bansko, BG',
+    icon: '⛰',
+    distance: '110 km',
+    elevation: '6 200 m',
+    athletes: '430',
+    date: 'Aug 15–16, 2026',
+    status: 'open',
+  },
+  {
+    id: 'rila80',
+    name: 'Rila',
+    nameEm: '80',
+    tagline: 'Alpine Challenge · Samokov, BG',
+    icon: '🌲',
+    distance: '82 km',
+    elevation: '4 100 m',
+    athletes: '560',
+    date: 'Sep 6, 2026',
+    status: 'soon',
+  },
+];
+
+const STATUS_LABELS = {
+  open: 'Predictions open',
+  results: 'Results in',
+  soon: 'Coming soon',
+};
+
+function renderRaces() {
+  const grid = document.getElementById('race-grid');
+  grid.innerHTML = '';
+
+  RACES.forEach(race => {
+    const card = document.createElement('a');
+    card.className = 'race-card' + (race.status === 'soon' ? ' coming-soon' : '');
+    card.href = race.status === 'soon' ? '#' : `race.html?race=${race.id}`;
+
+    card.innerHTML = `
+      <div class="card-accent"></div>
+      <div class="card-header">
+        <div class="card-icon">${race.icon}</div>
+        <span class="card-status status-${race.status}">${STATUS_LABELS[race.status]}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${race.name} <em>${race.nameEm}</em></div>
+        <div class="card-tagline">${race.tagline}</div>
+        <div class="card-stats">
+          <div class="card-stat"><span class="stat-label">Distance</span><span class="stat-value">${race.distance}</span></div>
+          <div class="card-stat"><span class="stat-label">Elevation</span><span class="stat-value">${race.elevation}</span></div>
+          <div class="card-stat"><span class="stat-label">Athletes</span><span class="stat-value">${race.athletes}</span></div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">📅 ${race.date}</span>
+        ${race.status !== 'soon' ? '<span class="card-go">Open →</span>' : '<span class="card-go">Soon</span>'}
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+renderRaces();
+</script>
+</body>
+</html>
